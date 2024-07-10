@@ -17,6 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-urlpatterns = [
+from django.urls import include, re_path
+from django.conf import settings
+from django.conf.urls.i18n import i18n_patterns
+
+urlpatterns = i18n_patterns(
     path('admin/', admin.site.urls),
-]
+)
+if 'rosetta' in settings.INSTALLED_APPS:
+    urlpatterns += [
+        re_path(r'^rosetta/', include('rosetta.urls'))
+    ]

@@ -14,10 +14,11 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv, dotenv_values
+from django.utils.translation import gettext_lazy as _
 load_dotenv()
 
 config = dotenv_values(".env")
-print("config: ", config)
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -51,15 +52,18 @@ LOCAL_APPS = [
     "news"
 ]
 
-THIRT_PARTY_APPS = [
-
+THIRD_PARTY_APPS = [
+    'rosetta',
+    'modeltranslation',
+    'rest_framework',
 ]
 
-INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRT_PARTY_APPS
+INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.locale.LocaleMiddleware', # new
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -86,6 +90,10 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'core.wsgi.application'
+
+LOCALE_PATHS = [
+    BASE_DIR / 'locale/',
+]
 
 
 # Database
@@ -127,11 +135,20 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tashkent'
 
 USE_I18N = True
 
+USE_L10N = True
+
 USE_TZ = True
+
+
+LANGUAGES = [
+    ('en', _('English')),
+    ('uz', _('Uzbek')),
+    ('ru', _('Russian')),
+]
 
 
 # Static files (CSS, JavaScript, Images)
@@ -143,3 +160,12 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
+MODELTRANSLATION_LANGUAGES = ('en', 'uz', 'ru')
+
+MODELTRANSLATION_TRANSLATION_FILES = (
+    'news.translation',
+)
+
+HOST = config["HOST"]
