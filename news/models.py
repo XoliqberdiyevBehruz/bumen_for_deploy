@@ -9,7 +9,7 @@ class News(models.Model):
     image = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True)
     title = models.CharField(_('title'), max_length=255)
     description = models.TextField(_('description'))
-    create_at = models.DateTimeField(_('create at'), auto_now_add=True)
+    created_at = models.DateTimeField(_('create at'), auto_now_add=True)
     is_publish = models.BooleanField(_('is publish'), default=True)
     published = NewsManager()
 

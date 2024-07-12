@@ -17,7 +17,7 @@ class Media(models.Model):
         MUSIX = 'music', _('music')
 
     type = models.CharField(_('type'), max_length=50, choices=MediaType.choices)
-    file = models.FileField(_('file'), upload_to='media/', validators=[FileExtensionValidator(
+    file = models.FileField(_('file'), upload_to='media_files/', validators=[FileExtensionValidator(
         allowed_extensions=['png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3']
     )])
 

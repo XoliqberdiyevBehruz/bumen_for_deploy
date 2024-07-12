@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Contacts, SocialMedia
+from .models import Contacts, SocialMedia, ContactWithUs
 
 
 # Register your models here.
@@ -11,4 +11,9 @@ class ContactsAdmin(admin.ModelAdmin):
 
 @admin.register(SocialMedia)
 class SocialMediaAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(ContactWithUs)
+class ContactWithUsAdmin(admin.ModelAdmin):
     pass

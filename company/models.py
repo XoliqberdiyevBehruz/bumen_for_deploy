@@ -1,5 +1,7 @@
 from django.db import models
 from .validators import phone_number_validator, validate_instagram_url, validate_telegram_url
+from phonenumber_field.modelfields import PhoneNumberField
+from django.utils.translation import gettext_lazy as _
 
 
 # Create your models here.
@@ -22,3 +24,13 @@ class SocialMedia(models.Model):
     class Meta:
         verbose_name = "Social Media"
         verbose_name_plural = "Social Medias"
+
+
+class ContactWithUs(models.Model):
+    name = models.CharField(max_length=100)
+    phone_number = PhoneNumberField()
+    message = models.TextField()
+
+    class Meta:
+        verbose_name = _("Contact With Us")
+        verbose_name_plural = _("Contact With Us")
