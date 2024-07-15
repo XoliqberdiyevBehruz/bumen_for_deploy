@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import ContactWithUs
+from .models import ContactWithUs, FAQ
 
 
 class ContactWithUsSerializer(serializers.ModelSerializer):
@@ -10,3 +10,8 @@ class ContactWithUsSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return ContactWithUs.objects.create(**validated_data)
 
+
+class FAQSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FAQ
+        fields = ("question", "answer")

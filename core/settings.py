@@ -15,13 +15,15 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv, dotenv_values
 from django.utils.translation import gettext_lazy as _
+
 load_dotenv()
+
+from .jazzmin_settings import *
 
 config = dotenv_values(".env")
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
@@ -34,10 +36,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 DJANGO_APPS = [
+    "jazzmin",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -65,7 +67,7 @@ INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware', # new
+    'django.middleware.locale.LocaleMiddleware',  # new
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -97,7 +99,6 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale/',
 ]
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -111,7 +112,6 @@ DATABASES = {
         'PASSWORD': config["POSTGRES_PASSWORD"],
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -131,7 +131,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -145,19 +144,21 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 LANGUAGES = [
     ('en', _('English')),
     ('uz', _('Uzbek')),
     ('ru', _('Russian')),
 ]
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
 MEDIA_URL = '/media/'
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
@@ -168,6 +169,9 @@ MODELTRANSLATION_LANGUAGES = ('en', 'uz', 'ru')
 
 MODELTRANSLATION_TRANSLATION_FILES = (
     'news.translation',
+    'company.translation'
 )
 
 HOST = config["HOST"]
+
+JAZZMIN_SETTINGS = JAZZMIN_SETTINGS

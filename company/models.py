@@ -34,3 +34,12 @@ class ContactWithUs(models.Model):
     class Meta:
         verbose_name = _("Contact With Us")
         verbose_name_plural = _("Contact With Us")
+
+
+class FAQ(models.Model):
+    question = models.TextField()
+    answer = models.TextField()
+
+    class Meta:
+        verbose_name = "FAQ"
+

@@ -9,6 +9,5 @@ admin.site.unregister(Group)
 
 @admin.register(Media)
 class MediaAdmin(admin.ModelAdmin):
-    pass
-
-
+    list_display = ["id", "type"]
+    list_filter = ["type"]
