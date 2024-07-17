@@ -7,21 +7,34 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0002_socialmedia'),
+        ("company", "0002_socialmedia"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ContactWithUs',
+            name="ContactWithUs",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('phone_number', phonenumber_field.modelfields.PhoneNumberField(max_length=128, region=None)),
-                ('message', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                (
+                    "phone_number",
+                    phonenumber_field.modelfields.PhoneNumberField(
+                        max_length=128, region=None
+                    ),
+                ),
+                ("message", models.TextField()),
             ],
             options={
-                'verbose_name': 'Contact With Us',
-                'verbose_name_plural': 'Contact With Us',
+                "verbose_name": "Contact With Us",
+                "verbose_name_plural": "Contact With Us",
             },
         ),
     ]

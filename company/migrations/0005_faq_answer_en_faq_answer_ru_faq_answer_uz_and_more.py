@@ -6,38 +6,38 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0004_faq'),
+        ("company", "0004_faq"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='faq',
-            name='answer_en',
+            model_name="faq",
+            name="answer_en",
             field=models.TextField(null=True),
         ),
         migrations.AddField(
-            model_name='faq',
-            name='answer_ru',
+            model_name="faq",
+            name="answer_ru",
             field=models.TextField(null=True),
         ),
         migrations.AddField(
-            model_name='faq',
-            name='answer_uz',
+            model_name="faq",
+            name="answer_uz",
             field=models.TextField(null=True),
         ),
         migrations.AddField(
-            model_name='faq',
-            name='question_en',
+            model_name="faq",
+            name="question_en",
             field=models.TextField(null=True),
         ),
         migrations.AddField(
-            model_name='faq',
-            name='question_ru',
+            model_name="faq",
+            name="question_ru",
             field=models.TextField(null=True),
         ),
         migrations.AddField(
-            model_name='faq',
-            name='question_uz',
+            model_name="faq",
+            name="question_uz",
             field=models.TextField(null=True),
         ),
     ]

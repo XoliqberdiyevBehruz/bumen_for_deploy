@@ -1,7 +1,12 @@
 from django.db import models
-from .validators import phone_number_validator, validate_instagram_url, validate_telegram_url
-from phonenumber_field.modelfields import PhoneNumberField
 from django.utils.translation import gettext_lazy as _
+from phonenumber_field.modelfields import PhoneNumberField
+
+from .validators import (
+    phone_number_validator,
+    validate_instagram_url,
+    validate_telegram_url,
+)
 
 
 # Create your models here.
@@ -42,4 +47,3 @@ class FAQ(models.Model):
 
     class Meta:
         verbose_name = "FAQ"
-

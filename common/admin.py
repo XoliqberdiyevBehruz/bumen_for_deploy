@@ -1,7 +1,7 @@
 from django.contrib import admin
-from .models import Media
+from django.contrib.auth.models import Group, User
 
-from django.contrib.auth.models import User, Group
+from .models import Media
 
 admin.site.unregister(User)
 admin.site.unregister(Group)

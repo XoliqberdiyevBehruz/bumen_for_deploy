@@ -1,14 +1,18 @@
+import datetime
+from unittest import mock
+
+import pytz
 from django.test import TestCase
 from django.urls import reverse
-from news.models import News
-from rest_framework.test import APITestCase
-from rest_framework import status
 from django.utils import timezone
-import datetime
-import pytz
-from unittest import mock
+from rest_framework import status
+from rest_framework.test import APITestCase
+
+from news.models import News
+
+
 class TestNewsListView(APITestCase):
-    url = reverse('news_list')
+    url = reverse("news_list")
 
     def setUp(self):
         self.news1 = News.published.create(

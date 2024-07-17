@@ -6,17 +6,17 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('news', '0003_news_published'),
+        ("news", "0003_news_published"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='news',
-            name='published',
+            model_name="news",
+            name="published",
         ),
         migrations.AddField(
-            model_name='news',
-            name='is_publish',
-            field=models.BooleanField(default=True, verbose_name='is publish'),
+            model_name="news",
+            name="is_publish",
+            field=models.BooleanField(default=True, verbose_name="is publish"),
         ),
     ]

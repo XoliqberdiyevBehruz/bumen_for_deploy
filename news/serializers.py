@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from news.models import News
 from common.serializers import MediaURlSerializer
+from news.models import News
 
 
 class NewsListSerializer(serializers.ModelSerializer):

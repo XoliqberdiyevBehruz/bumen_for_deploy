@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import ContactWithUs, FAQ
+
+from .models import FAQ, ContactWithUs
 
 
 class ContactWithUsSerializer(serializers.ModelSerializer):

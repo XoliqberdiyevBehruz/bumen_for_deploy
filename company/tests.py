@@ -1,6 +1,6 @@
 from django.test import TestCase
-from rest_framework.test import APITestCase
 from django.urls import reverse
+from rest_framework.test import APITestCase
 
 
 class TestContactWithUsView(APITestCase):
@@ -9,13 +9,15 @@ class TestContactWithUsView(APITestCase):
         pass
 
     def test_happy(self):
-        url = reverse('contact_with_us')
+        url = reverse("contact_with_us")
         data = {
             "name": "TestName",
             "phone_number": "+998919209292",
-            "message": "TestMesssage"
+            "message": "TestMesssage",
         }
-        response = self.client.post(url, data, format='json')
+        response = self.client.post(url, data, format="json")
         self.assertEquals(response.status_code, 201)
-        self.assertEquals(response.data['name'], 'TestName')
-        self.assertEquals(list(response.data.keys()), ['name', 'phone_number', 'message'])
+        self.assertEquals(response.data["name"], "TestName")
+        self.assertEquals(
+            list(response.data.keys()), ["name", "phone_number", "message"]
+        )

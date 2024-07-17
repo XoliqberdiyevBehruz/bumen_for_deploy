@@ -6,19 +6,27 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('company', '0003_contactwithus'),
+        ("company", "0003_contactwithus"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='FAQ',
+            name="FAQ",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('question', models.TextField()),
-                ('answer', models.TextField()),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("question", models.TextField()),
+                ("answer", models.TextField()),
             ],
             options={
-                'verbose_name': 'FAQ',
+                "verbose_name": "FAQ",
             },
         ),
     ]

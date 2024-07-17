@@ -7,14 +7,14 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('news', '0004_remove_news_published_news_is_publish'),
+        ("news", "0004_remove_news_published_news_is_publish"),
     ]
 
     operations = [
         migrations.AlterModelManagers(
-            name='news',
+            name="news",
             managers=[
-                ('published', django.db.models.manager.Manager()),
+                ("published", django.db.models.manager.Manager()),
             ],
         ),
     ]

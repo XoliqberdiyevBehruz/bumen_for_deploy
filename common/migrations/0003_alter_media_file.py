@@ -7,13 +7,21 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('common', '0002_alter_media_options_alter_media_file'),
+        ("common", "0002_alter_media_options_alter_media_file"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='media',
-            name='file',
-            field=models.FileField(upload_to='media_files/', validators=[django.core.validators.FileExtensionValidator(allowed_extensions=['png', 'jpg', 'jpeg', 'gif', 'mp4', 'mp3'])], verbose_name='file'),
+            model_name="media",
+            name="file",
+            field=models.FileField(
+                upload_to="media_files/",
+                validators=[
+                    django.core.validators.FileExtensionValidator(
+                        allowed_extensions=["png", "jpg", "jpeg", "gif", "mp4", "mp3"]
+                    )
+                ],
+                verbose_name="file",
+            ),
         ),
     ]

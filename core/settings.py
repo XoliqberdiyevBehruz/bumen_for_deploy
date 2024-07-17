@@ -13,8 +13,9 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 import os
 from pathlib import Path
-from dotenv import load_dotenv, dotenv_values
+
 from django.utils.translation import gettext_lazy as _
+from dotenv import dotenv_values, load_dotenv
 
 load_dotenv()
 
@@ -29,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uwd$c$y48a^xzu10u2vex*=3u!%7a8cdo2uil=r-z!-4ay5vvo'
+SECRET_KEY = "django-insecure-uwd$c$y48a^xzu10u2vex*=3u!%7a8cdo2uil=r-z!-4ay5vvo"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -40,76 +41,72 @@ ALLOWED_HOSTS = []
 
 DJANGO_APPS = [
     "jazzmin",
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 ]
 
-LOCAL_APPS = [
-    "common",
-    "company",
-    "news"
-]
+LOCAL_APPS = ["common", "company", "news"]
 
 THIRD_PARTY_APPS = [
-    'rosetta',
-    'modeltranslation',
-    'rest_framework',
-    'phonenumber_field',
-    'drf_yasg',
+    "rosetta",
+    "modeltranslation",
+    "rest_framework",
+    "phonenumber_field",
+    "drf_yasg",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + LOCAL_APPS + THIRD_PARTY_APPS
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.locale.LocaleMiddleware',  # new
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # new
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [],
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
 ]
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = "core.wsgi.application"
 
 LOCALE_PATHS = [
-    BASE_DIR / 'locale/',
+    BASE_DIR / "locale/",
 ]
 
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config["POSTGRES_NAME"],
-        'HOST': config["POSTGRES_HOST"],
-        'USER': config["POSTGRES_USER"],
-        'PORT': config["POSTGRES_PORT"],
-        'PASSWORD': config["POSTGRES_PASSWORD"],
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config["POSTGRES_NAME"],
+        "HOST": config["POSTGRES_HOST"],
+        "USER": config["POSTGRES_USER"],
+        "PORT": config["POSTGRES_PORT"],
+        "PASSWORD": config["POSTGRES_PASSWORD"],
     }
 }
 
@@ -118,25 +115,25 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'Asia/Tashkent'
+TIME_ZONE = "Asia/Tashkent"
 
 USE_I18N = True
 
@@ -145,16 +142,16 @@ USE_L10N = True
 USE_TZ = True
 
 LANGUAGES = [
-    ('en', _('English')),
-    ('uz', _('Uzbek')),
-    ('ru', _('Russian')),
+    ("en", _("English")),
+    ("uz", _("Uzbek")),
+    ("ru", _("Russian")),
 ]
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = 'static/'
-MEDIA_URL = '/media/'
+STATIC_URL = "static/"
+MEDIA_URL = "/media/"
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",
@@ -162,15 +159,12 @@ STATICFILES_DIRS = [
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-MODELTRANSLATION_DEFAULT_LANGUAGE = 'en'
-MODELTRANSLATION_LANGUAGES = ('en', 'uz', 'ru')
+MODELTRANSLATION_DEFAULT_LANGUAGE = "en"
+MODELTRANSLATION_LANGUAGES = ("en", "uz", "ru")
 
-MODELTRANSLATION_TRANSLATION_FILES = (
-    'news.translation',
-    'company.translation'
-)
+MODELTRANSLATION_TRANSLATION_FILES = ("news.translation", "company.translation")
 
 HOST = config["HOST"]
 
