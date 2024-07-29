@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Groups, User, UserMessage
+from .models import Groups, User, UserMessage, UserOtpCode
 
 
 class UserMessageInlineAdmin(admin.StackedInline):
@@ -10,6 +10,7 @@ class UserMessageInlineAdmin(admin.StackedInline):
 
 class UserAdmin(admin.ModelAdmin):
     inlines = [UserMessageInlineAdmin]
+    list_display = ("id", "username", "email")
 
 
 admin.site.register(User, UserAdmin)
@@ -30,3 +31,8 @@ class UserMessageAdmin(admin.ModelAdmin):
 
 
 admin.site.register(UserMessage, UserMessageAdmin)
+
+
+@admin.register(UserOtpCode)
+class UserOtpCodeAdmin(admin.ModelAdmin):
+    list_display = ("id", "user", "code", "type")

@@ -8,7 +8,8 @@ from common.models import Media
 class User(AbstractUser):
     birth_date = models.DateField(_("birth_date"), null=True, blank=True)
     photo = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True)
-    USERNAME_FIELD = "username"
+    email = models.EmailField(_("email address"), unique=True)
+    USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
     def __str__(self) -> str:
@@ -17,6 +18,21 @@ class User(AbstractUser):
     class Meta:
         verbose_name = _("User")
         verbose_name_plural = _("Users")
+
+
+class UserOtpCode(models.Model):
+    class VerificationType(models.TextChoices):
+        REGISTER = "register"
+        RESET_PASSWORD = "reset_password"
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    type = models.CharField(_("type"), max_length=20, choices=VerificationType.choices)
+    expires_in = models.DateTimeField(_("expires_in"), null=True, blank=True)
+    is_used = models.BooleanField(_("is_used"), default=False)
+
+    def __str__(self) -> str:
+        return self.code
 
 
 class Groups(models.Model):

@@ -34,7 +34,7 @@ schema_view = get_schema_view(
         license=openapi.License(name="BSD License"),
     ),
     public=True,
-    permission_classes=(permissions.AllowAny,),
+    permission_classes=(),
 )
 
 urlpatterns = [
@@ -47,6 +47,7 @@ urlpatterns += i18n_patterns(
 urlpatterns += [
     path("api/company/", include("company.urls")),
     path("api/news/", include("news.urls")),
+    path("api/account/", include("account.urls")),
     path(
         "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"
     ),
