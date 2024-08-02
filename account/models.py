@@ -1,14 +1,25 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from common.models import Media
 
+from .managers import CustomUserManager
+
 
 class User(AbstractUser):
+    class AuthType(models.TextChoices):
+        GOOGLE = "GOOGLE", _("Google Account")
+        FACEBOOK = "FACEBOOK", _("Facebook Account")
+        TELEGRAM = "TELEGRAM", _("Telegram Account")
+        WITH_EMAIL = "WITH EMAIL", _("Email Account")
+
     birth_date = models.DateField(_("birth_date"), null=True, blank=True)
     photo = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True)
     email = models.EmailField(_("email address"), unique=True)
+    auth_type = models.CharField(_("auth type"), choices=AuthType.choices)
+    objects = CustomUserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
@@ -18,6 +29,9 @@ class User(AbstractUser):
     class Meta:
         verbose_name = _("User")
         verbose_name_plural = _("Users")
+
+    def get_token(self):
+        return RefreshToken.access_token
 
 
 class UserOtpCode(models.Model):
@@ -67,3 +81,18 @@ class UserMessage(models.Model):
     class Meta:
         verbose_name = _("User's message")
         verbose_name_plural = _("User's messages")
+
+
+class SocialUser(models.Model):
+    class RegisterType(models.TextChoices):
+        GOOGLE = "google", _("google")
+        FACEBOOK = "facebook", _("facebook")
+        TELEGRAM = "telegram", _("telegram")
+
+    user = models.ForeignKey(
+        verbose_name=_("User"), to=User, on_delete=models.CASCADE, null=True, blank=True
+    )
+    social_user_id = models.IntegerField(_("user id"), null=True, blank=True)
+    provider = models.CharField(_("provider"), choices=RegisterType.choices)
+    email = models.EmailField(_("email address"), unique=True)
+    extra_data = models.JSONField(_("extra data"), default=dict)

@@ -13,3 +13,4 @@ psycopg2-binary
 django-rosetta
 django-ckeditor
 djangorestframework-simplejwt
+django-ckeditor-5
