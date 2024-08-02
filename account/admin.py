@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.utils.translation import gettext_lazy as _
 
 from .models import Groups, User, UserMessage, UserOtpCode
 
@@ -8,12 +10,42 @@ class UserMessageInlineAdmin(admin.StackedInline):
     extra = 1
 
 
-class UserAdmin(admin.ModelAdmin):
+class CustomUserAdmin(UserAdmin):
     inlines = [UserMessageInlineAdmin]
-    list_display = ("id", "username", "email")
+    # list_display = ("id", "email", "first_name", "last_name")
+
+    fieldsets = (
+        (None, {"fields": ("email", "password")}),
+        (
+            _("Personal info"),
+            {"fields": ("first_name", "last_name", "birth_date", "photo")},
+        ),
+        (
+            _("Permissions"),
+            {
+                "fields": (
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "groups",
+                    "user_permissions",
+                ),
+            },
+        ),
+        # (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+    )
+    add_fieldsets = (
+        (
+            None,
+            {
+                "classes": ("wide",),
+                "fields": ("email", "password1", "password2"),
+            },
+        ),
+    )
 
 
-admin.site.register(User, UserAdmin)
+admin.site.register(User, CustomUserAdmin)
 
 admin.site.register(Groups)
 

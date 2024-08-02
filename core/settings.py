@@ -379,3 +379,19 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_OBTAIN_SERIALIZER": "rest_framework_simplejwt.serializers.TokenObtainSlidingSerializer",
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
+
+
+import sentry_sdk
+
+sentry_sdk.init(
+    dsn="https://f36feba9294055f713e9d3312a0ff785@o4506237032988672.ingest.us.sentry.io/4507708330409984",
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for performance monitoring.
+    traces_sample_rate=1.0,
+    # Set profiles_sample_rate to 1.0 to profile 100%
+    # of sampled transactions.
+    # We recommend adjusting this value in production.
+    profiles_sample_rate=1.0,
+)
+
+SOCIAL_SECRET_PASSWORD = config["SOCIAL_SECRET_PASSWORD"]

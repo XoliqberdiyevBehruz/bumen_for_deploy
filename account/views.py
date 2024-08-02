@@ -8,7 +8,11 @@ from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
 
 from .models import User, UserOtpCode
-from .serializers import UserOtpCodeVerifySerializer, UserRegisterSerializer
+from .serializers import (
+    GoogleSocialAuthSerializer,
+    UserOtpCodeVerifySerializer,
+    UserRegisterSerializer,
+)
 from .utils import generate_otp_code, send_verification_code
 
 
@@ -72,3 +76,8 @@ class UserRegisterVerifyView(CreateAPIView):
                 status=status.HTTP_404_NOT_FOUND,
                 data={"message": "User does not exist"},
             )
+
+
+class GoogleRegisterView(CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = GoogleSocialAuthSerializer
