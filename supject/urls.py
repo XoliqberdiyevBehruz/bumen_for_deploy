@@ -1,5 +1,5 @@
 from django.urls import path
-from subject.views import CategoryAPIView, StartSubjectApi, StartSubjectAPIView
+from .views import CategoryAPIView, StartSubjectApi, StartSubjectAPIView
 
 urlpatterns = [
     path('category/<int:pk>/', CategoryAPIView.as_view(), name='category-subject'),
