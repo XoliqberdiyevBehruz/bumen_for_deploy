@@ -1,11 +1,12 @@
 from rest_framework import serializers
-from subject.models import SubjectTitle, Category, Step, Subject, UserSubject
+from supject.models import SubjectTitle, Category, Step, Subject, UserSubject
 
 
 class StepSerializer(serializers.ModelSerializer):
     class Meta:
         model = Step
-        fields = ['id', 'title', 'order', 'description']
+        fields = ['id'
+                  '', 'title', 'order', 'description']
 
 
 class SubjectSerializer(serializers.ModelSerializer):

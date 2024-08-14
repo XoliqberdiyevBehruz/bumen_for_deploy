@@ -14,3 +14,4 @@ django-rosetta
 django-ckeditor
 djangorestframework-simplejwt
 django-ckeditor-5
+sentry-sdk
