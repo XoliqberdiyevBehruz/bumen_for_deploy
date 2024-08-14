@@ -3,7 +3,9 @@ from django.urls import path
 from .views import (
     CategoryAPIView,
     CategoryListView,
+    StartStepTestView,
     StartSubjectApi,
+    StepDetailAPIView,
     SubjectTitleApiView,
 )
 
@@ -16,4 +18,6 @@ urlpatterns = [
     ),
     path("subject-titles/", SubjectTitleApiView.as_view(), name="subject-titles"),
     path("categories/", CategoryListView.as_view(), name="categories"),
+    path("steps/<int:pk>/", StepDetailAPIView.as_view(), name="step-detail"),
+    path("steps/start-test/", StartStepTestView.as_view(), name="step-start-test"),
 ]
