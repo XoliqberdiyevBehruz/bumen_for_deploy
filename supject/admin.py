@@ -5,12 +5,13 @@ from .models import (
     Club,
     ClubMeeting,
     Step,
-    StepLesson,
+    StepFile,
     StepTest,
     Subject,
     SubjectTitle,
     TestAnswer,
     TestQuestion,
+    UserStep,
     UserSubject,
     UserTestResult,
     UserTotalTestResult,
@@ -19,6 +20,8 @@ from .models import (
 
 
 admin.site.register(TestQuestion)
+admin.site.register(TestAnswer)
+admin.site.register(UserTotalTestResult)
 
 
 class SubjectTitleInline(admin.StackedInline):
@@ -43,12 +46,31 @@ class SubjectTitleAdmin(admin.ModelAdmin):
     inlines = [SubjectInline]
 
 
+class StepInlineAdmin(admin.StackedInline):
+    model = Step
+    extra = 1
+
+
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "type")
+    inlines = [StepInlineAdmin]
 
 
 @admin.register(UserSubject)
 class UserSubjectAdmin(admin.ModelAdmin):
     list_display = ("id", "user")
 
+@admin.register(StepFile)
+class StepFileAdmin(admin.ModelAdmin):
+    list_display = ("id", "title")
+
+
+@admin.register(UserStep)
+class UserStepAdmin(admin.ModelAdmin):
+    list_display = ("id", "user")
+
+
+@admin.register(StepTest)
+class StepTestAdmin(admin.ModelAdmin):
+    pass

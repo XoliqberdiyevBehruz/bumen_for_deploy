@@ -14,7 +14,7 @@ class User(AbstractUser):
         FACEBOOK = "FACEBOOK", _("Facebook Account")
         TELEGRAM = "TELEGRAM", _("Telegram Account")
         WITH_EMAIL = "WITH EMAIL", _("Email Account")
-
+    username = None
     birth_date = models.DateField(_("birth_date"), null=True, blank=True)
     photo = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True)
     email = models.EmailField(_("email address"), unique=True)

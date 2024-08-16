@@ -1,13 +1,25 @@
 from rest_framework import serializers
 
-from supject.models import Category, Step, Subject, SubjectTitle, UserSubject
+from common.serializers import MediaURlSerializer
+from supject.models import (
+    Category,
+    Step,
+    StepFile,
+    Subject,
+    SubjectTitle,
+    TestAnswer,
+    TestQuestion,
+    UserSubject,
+)
 
 
 class StepSerializer(serializers.ModelSerializer):
     class Meta:
         model = Step
 
-        fields = ["id", "title", "order", "description"]
+        fields = [
+            "id",
+        ]
 
 
 class SubjectSerializer(serializers.ModelSerializer):
@@ -19,9 +31,11 @@ class SubjectSerializer(serializers.ModelSerializer):
 
 
 class SubjectDetailSerializer(serializers.ModelSerializer):
+    steps = StepSerializer(many=True)
+
     class Meta:
         model = Subject
-        fields = ("id", "name", "type")
+        fields = ("id", "name", "type", "steps")
 
 
 class UserSubjectSerializer(serializers.ModelSerializer):
@@ -50,3 +64,37 @@ class SubjectTitleListSerializer(serializers.ModelSerializer):
     class Meta:
         model = SubjectTitle
         fields = ("id", "name", "subjects")
+
+
+class StepFilesSerializer(serializers.ModelSerializer):
+    file = MediaURlSerializer()
+
+    class Meta:
+        model = StepFile
+        fields = ["id", "title", "file"]
+
+
+class StepDetailSerializer(serializers.ModelSerializer):
+    step_files = StepFilesSerializer(many=True)
+
+    class Meta:
+        model = Step
+        fields = ["title", "description", "step_files"]
+
+
+class StartStepTestSerializer(serializers.Serializer):
+    step_id = serializers.IntegerField(required=True)
+
+
+class TestAnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestAnswer
+        fields = ("id", "answer")
+
+
+class StepTestQuestionTestSerializer(serializers.ModelSerializer):
+    test_answers = TestAnswerSerializer(many=True)
+
+    class Meta:
+        model = TestQuestion
+        fields = ("id", "question_type", "question", "test_answers")
