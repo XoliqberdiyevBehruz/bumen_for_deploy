@@ -43,7 +43,10 @@ class Subject(models.Model):
         verbose_name=_("Type"), max_length=50, choices=SubjectType.choices
     )
     subject_title = models.ForeignKey(
-        verbose_name=_("Subject title"), to=SubjectTitle, on_delete=models.CASCADE
+        verbose_name=_("Subject title"),
+        to=SubjectTitle,
+        on_delete=models.CASCADE,
+        related_name="subjects",
     )
 
     def __str__(self) -> str:
@@ -59,7 +62,11 @@ class UserSubject(models.Model):
         verbose_name=_("Subject"), to=Subject, on_delete=models.CASCADE
     )
     user = models.ForeignKey(verbose_name=_("User"), to=User, on_delete=models.CASCADE)
-    total_test_ball = models.PositiveIntegerField(verbose_name=_("Total test bal"))
+    total_test_ball = models.PositiveIntegerField(
+        verbose_name=_("Total test bal"), default=0.0
+    )
+    started_time = models.DateTimeField(auto_now_add=True)
+    started = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return f"{self.user.username} - {self.subject.name}"
