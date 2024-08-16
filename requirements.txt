@@ -14,3 +14,9 @@ django-rosetta
 django-ckeditor
 djangorestframework-simplejwt
 django-ckeditor-5
+setuptools
+phonenumbers
+google-api-python-client
+google-cloud
+google-auth
+
