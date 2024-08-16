@@ -97,3 +97,13 @@ class StepTestQuestionTestSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestQuestion
         fields = ("id", "question_type", "question", "test_answers")
+
+
+class FinishTestQuestionSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField(required=True)
+    answer_ids = serializers.ListField(source=serializers.IntegerField())
+
+
+class StepTestFinishSerializer(serializers.Serializer):
+    result_id = serializers.IntegerField(required=True)
+    questions = serializers.ListField(source=FinishTestQuestionSerializer())
