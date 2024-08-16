@@ -15,6 +15,7 @@ class User(AbstractUser):
         TELEGRAM = "TELEGRAM", _("Telegram Account")
         WITH_EMAIL = "WITH EMAIL", _("Email Account")
 
+    username = models.CharField(max_length=123, null=True, blank=True)
     birth_date = models.DateField(_("birth_date"), null=True, blank=True)
     photo = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True)
     email = models.EmailField(_("email address"), unique=True)
@@ -24,7 +25,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = []
 
     def __str__(self) -> str:
-        return self.username
+        return self.email
 
     class Meta:
         verbose_name = _("User")
