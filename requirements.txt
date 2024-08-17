@@ -14,3 +14,8 @@ django-rosetta
 django-ckeditor
 djangorestframework-simplejwt
 django-ckeditor-5
+sentry_sdk
+setuptools
+phonenumbers
+google-cloud
+google-auth
