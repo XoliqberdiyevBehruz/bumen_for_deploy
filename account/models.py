@@ -17,7 +17,7 @@ class User(AbstractUser):
 
     username = models.CharField(max_length=123, null=True, blank=True)
     birth_date = models.DateField(_("birth_date"), null=True, blank=True)
-    photo = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True)
+    photo = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True, related_name='photo')
     email = models.EmailField(_("email address"), unique=True)
     auth_type = models.CharField(_("auth type"), choices=AuthType.choices)
     objects = CustomUserManager()

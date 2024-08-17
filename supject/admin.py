@@ -21,6 +21,8 @@ from .models import (
 admin.site.register(TestQuestion)
 admin.site.register(TestAnswer)
 admin.site.register(UserTotalTestResult)
+admin.site.register(Club)
+admin.site.register(ClubMeeting)
 
 
 class SubjectTitleInline(admin.StackedInline):

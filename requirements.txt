@@ -1,5 +1,6 @@
-Django
+Django==5.0.0
 python-dotenv
+django-phonenumbers
 black
 flake8
 isort

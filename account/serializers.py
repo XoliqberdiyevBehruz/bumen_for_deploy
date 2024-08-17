@@ -7,6 +7,7 @@ from rest_framework.exceptions import APIException
 from account.auth import google, register, facebook
 from account.models import SocialUser, User
 from django.conf import settings
+from common.serializers import MediaURlSerializer
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -102,3 +103,11 @@ class FacebookSerializer(serializers.Serializer):
             raise serializers.ValidationError(f'Ошибка при регистрации пользователя: {e}')
         
 
+
+
+class UserSerializer(serializers.ModelSerializer):
+    photo = MediaURlSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email", "photo", "birth_date")
