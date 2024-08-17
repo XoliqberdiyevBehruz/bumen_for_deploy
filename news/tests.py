@@ -28,8 +28,8 @@ class TestNewsListView(APITestCase):
 
     def test_happy(self):
         resp = self.client.get(self.url)
-        self.assertEquals(resp.status_code, status.HTTP_200_OK)
-        self.assertEquals(len(resp.data), 2)
+        self.assertEqual(resp.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(resp.data), 2)
 
         # mocked = datetime.datetime(2018, 4, 4, 0, 0, 0, tzinfo=pytz.utc)
         # with mock.patch('django.utils.timezone.now', mock.Mock(return_value=mocked)):

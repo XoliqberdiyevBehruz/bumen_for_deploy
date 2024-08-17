@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Count
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -6,7 +6,6 @@ from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
-    ListCreateAPIView,
     RetrieveAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
@@ -158,4 +157,23 @@ class StartStepTestView(CreateAPIView):
             }
             return Response(data=data)
         except Exception as e:
-            raise APIException(e)
+            raise APIException(e)       
+
+
+class UserPopularSubject(APIView):
+    def get(self, request):
+        started_subjects = UserSubject.objects.filter(started=True).values('subject').annotate(start_count=Count('id')).order_by('-start_count')
+        
+        if not started_subjects:
+            return Response({'error': 'No subjects found'}, status=404)
+        
+        subject_ids = [item['subject'] for item in started_subjects]
+        subjects = Subject.objects.filter(id__in=subject_ids)
+        
+        serializer = SubjectSerializer(subjects, many=True)
+        
+        for subject in serializer.data:
+            subject_id = subject['id']
+            subject['start_count'] = next(item['start_count'] for item in started_subjects if item['subject'] == subject_id)
+        
+        return Response(serializer.data)

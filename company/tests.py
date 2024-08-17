@@ -16,8 +16,8 @@ class TestContactWithUsView(APITestCase):
             "message": "TestMesssage",
         }
         response = self.client.post(url, data, format="json")
-        self.assertEquals(response.status_code, 201)
-        self.assertEquals(response.data["name"], "TestName")
-        self.assertEquals(
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data["name"], "TestName")
+        self.assertEqual(
             list(response.data.keys()), ["name", "phone_number", "message"]
         )

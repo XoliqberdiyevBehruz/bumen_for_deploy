@@ -97,3 +97,11 @@ class StepTestQuestionTestSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestQuestion
         fields = ("id", "question_type", "question", "test_answers")
+
+
+class UserPopularSubjectSerializer(serializers.ModelSerializer):
+    start_count = serializers.IntegerField()
+
+    class Meta:
+        model = Subject
+        fields = ('id', 'name', 'type', 'subject_title', 'start_count')
