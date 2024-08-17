@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from account.auth import google, register
-from account.models import SocialUser, User
+from account.models import SocialUser, User, UserMessage
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -50,3 +50,10 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
         except Exception as e:
             sentry_sdk.capture_exception(e)
             raise serializers.ValidationError(e)
+
+
+
+class UserMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMessage
+        fields = '__all__'
