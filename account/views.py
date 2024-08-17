@@ -6,10 +6,12 @@ from django.utils import timezone
 from rest_framework import status
 from rest_framework.generics import CreateAPIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from .models import User, UserOtpCode
 from .serializers import (
-    GoogleSocialAuthSerializer,
+    GoogleSerializer,
+    FacebookSerializer,
     UserOtpCodeVerifySerializer,
     UserRegisterSerializer,
 )
@@ -78,6 +80,16 @@ class UserRegisterVerifyView(CreateAPIView):
             )
 
 
-class GoogleRegisterView(CreateAPIView):
+class GoogleAuth(APIView):
+    def get(self, request, *args, **kwargs):
+        auth_token = str(request.query_params.get('code'))
+        ser = GoogleSerializer(data={'auth_token': auth_token})
+        if ser.is_valid():
+            return Response(ser.data)
+        return Response(ser.errors, status=400)
+ 
+
+class FacebookAuth(CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = GoogleSocialAuthSerializer
+    serializer_class = FacebookSerializer
+    
