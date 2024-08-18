@@ -91,7 +91,7 @@ class FacebookSerializer(serializers.Serializer):
 
         try:
             return register.register_social_user(
-                auth_type=User.AuthType.GOOGLE,
+                auth_type=User.AuthType.FACEBOOK,
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
@@ -102,8 +102,6 @@ class FacebookSerializer(serializers.Serializer):
         except Exception as e:
             raise serializers.ValidationError(f'Ошибка при регистрации пользователя: {e}')
         
-
-
 
 class UserSerializer(serializers.ModelSerializer):
     photo = MediaURlSerializer(read_only=True)
