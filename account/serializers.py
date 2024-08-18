@@ -4,10 +4,13 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 from rest_framework.exceptions import APIException
 
+
 from account.auth import google, register, facebook
-from account.models import SocialUser, User
 from django.conf import settings
 from common.serializers import MediaURlSerializer
+
+
+from account.models import SocialUser, User, UserMessage
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -91,7 +94,7 @@ class FacebookSerializer(serializers.Serializer):
 
         try:
             return register.register_social_user(
-                auth_type=User.AuthType.GOOGLE,
+                auth_type=User.AuthType.FACEBOOK,
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
@@ -111,3 +114,11 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ("first_name", "last_name", "email", "photo", "birth_date")
+
+
+
+
+class UserMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMessage
+        fields = '__all__'

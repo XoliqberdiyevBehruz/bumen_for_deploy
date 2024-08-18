@@ -1,7 +1,7 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from .views import (GoogleAuth, FacebookAuth, UserRegisterVerifyView, UserRegisterView, UserMessageCreateApi, MessageListApi)
 
-from .views import UserRegisterVerifyView, UserRegisterView, GoogleAuth, FacebookAuth
 
 urlpatterns = [
     path("register/", UserRegisterView.as_view(), name="register"),
@@ -10,4 +10,7 @@ urlpatterns = [
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path('google/', GoogleAuth.as_view(), name='googleauth'),
     path('facebook/', FacebookAuth.as_view(), name='facebookauth'),
+    path('messages/', UserMessageCreateApi.as_view(), name='create_message'),
+    path('messages/<int:group_id>/', MessageListApi.as_view(), name='list_messages'),
 ]
+
