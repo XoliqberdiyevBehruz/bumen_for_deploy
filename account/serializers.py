@@ -106,8 +106,6 @@ class FacebookSerializer(serializers.Serializer):
             raise serializers.ValidationError(f'Ошибка при регистрации пользователя: {e}')
         
 
-
-
 class UserSerializer(serializers.ModelSerializer):
     photo = MediaURlSerializer(read_only=True)
 
