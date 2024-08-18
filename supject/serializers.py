@@ -46,15 +46,19 @@ class UserSubjectSerializer(serializers.ModelSerializer):
 
 
 class SubjectTitleSerializer(serializers.ModelSerializer):
+    subjects = SubjectSerializer(many=True, read_only=True)
+
     class Meta:
         model = SubjectTitle
-        fields = ["id", "name", "category"]
+        fields = ["id", "name", "category","subjects"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    subject_titles = SubjectTitleSerializer(many=True, read_only=True, source='subjecttitle_set')
+
     class Meta:
         model = Category
-        fields = ["id", "name", "click_count"]
+        fields = ["id", "name", "click_count", "subject_titles"]
 
 
 class SubjectTitleListSerializer(serializers.ModelSerializer):
