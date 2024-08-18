@@ -184,3 +184,17 @@ class UserClubsView(APIView):
             clubs.append(ClubSerializer(Club.objects.get(subject=i.subject)).data)
 
         return Response({'user': UserSerializer(user).data, 'clubs': clubs})
+    
+
+class ClubDetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+
+    def get(self, req: Request, pk):
+        try: 
+            club = Club.objects.get(pk=pk)
+            meetings = ClubMeeting.objects.filter(club=club)
+
+            return Response({'club': ClubSerializer(club).data, 'meetings': ClubMeetingSerializer(meetings, many=True).data})
+        except Exception as e:
+            raise APIException(e)
