@@ -3,6 +3,8 @@ from rest_framework import serializers
 from common.serializers import MediaURlSerializer
 from supject.models import (
     Category,
+    Club,
+    ClubMeeting,
     Step,
     StepFile,
     Subject,
@@ -11,6 +13,7 @@ from supject.models import (
     TestQuestion,
     UserSubject,
 )
+from account.serializers import UserSerializer
 
 
 class StepSerializer(serializers.ModelSerializer):
@@ -97,3 +100,13 @@ class StepTestQuestionTestSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestQuestion
         fields = ("id", "question_type", "question", "test_answers")
+
+
+class ClubSerializer(serializers.ModelSerializer):
+    subject = SubjectSerializer(read_only=True)
+    users = UserSerializer(many=True, read_only=True)
+
+
+    class Meta:
+        model = Club
+        fields = ("id", "name", "users", "subject", "description")
