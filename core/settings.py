@@ -106,13 +106,21 @@ LOCALE_PATHS = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config["POSTGRES_NAME"],
-        "HOST": config["POSTGRES_HOST"],
-        "USER": config["POSTGRES_USER"],
-        "PORT": config["POSTGRES_PORT"],
-        "PASSWORD": config["POSTGRES_PASSWORD"],
+        "NAME": config["DB_NAME"],
+        "HOST": config["DB_HOST"],
+        "USER": config["DB_USER"],
+        "PORT": config["DB_PORT"],
+        "PASSWORD": config["DB_PASSWORD"],
     }
 }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -395,3 +403,10 @@ sentry_sdk.init(
 )
 
 SOCIAL_SECRET_PASSWORD = config["SOCIAL_SECRET_PASSWORD"]
+
+
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI')
+GOOGLE_GRANT_TYPE = os.getenv('GOOGLE_GRANT_TYPE')
+SOCIAL_USER_PASSWORD = os.getenv('SOCIAL_USER_PASSWORD')

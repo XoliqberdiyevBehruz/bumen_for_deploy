@@ -10,6 +10,7 @@ from rest_framework.generics import (
     RetrieveAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -61,6 +62,9 @@ class StartSubjectApi(APIView):
         if created:
             user_subject.started = True
             user_subject.save()
+        club = Club.objects.get(subject=subject)
+        club.users.add(user)
+        club.save()
         subject_serializer = UserSubjectSerializer(user_subject)
         return Response(data=subject_serializer.data, status=status.HTTP_200_OK)
 
@@ -159,6 +163,45 @@ class StartStepTestView(CreateAPIView):
                 ).data,
             }
             return Response(data=data)
+        except Exception as e:
+            raise APIException(e)
+
+
+class UserClubsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, req: Request):
+        user = User.objects.get(email=req.user)
+
+        user_subjects = UserSubject.objects.filter(user=user)
+
+        if not user_subjects.exists():
+            return Response(
+                {"error": "You do not have subjects so we can not enter you to club"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        clubs = []
+        for i in user_subjects:
+            clubs.append(ClubSerializer(Club.objects.get(subject=i.subject)).data)
+
+        return Response({"user": UserSerializer(user).data, "clubs": clubs})
+
+
+class ClubDetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, req: Request, pk):
+        try:
+            club = Club.objects.get(pk=pk)
+            meetings = ClubMeeting.objects.filter(club=club)
+
+            return Response(
+                {
+                    "club": ClubSerializer(club).data,
+                    "meetings": ClubMeetingSerializer(meetings, many=True).data,
+                }
+            )
         except Exception as e:
             raise APIException(e)
 

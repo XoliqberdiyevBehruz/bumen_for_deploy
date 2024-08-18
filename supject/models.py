@@ -98,7 +98,7 @@ class Club(models.Model):
         verbose_name=_("Subject"), to=Subject, on_delete=models.CASCADE
     )
     users = models.ManyToManyField(
-        verbose_name=_("Users"), to=User, related_name="clubusers"
+        verbose_name=_("Users"), to=User, related_name="clubusers", blank=True
     )
     description = models.TextField(verbose_name=_("Description"))
 

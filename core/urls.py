@@ -49,6 +49,7 @@ urlpatterns += [
     path("api/news/", include("news.urls")),
     path("api/account/", include("account.urls")),
     path("api/subject/", include("supject.urls")),
+    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path(
         "swagger<format>/", schema_view.without_ui(cache_timeout=0), name="schema-json"
     ),

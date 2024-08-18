@@ -3,15 +3,21 @@ from datetime import timedelta
 from django.conf import settings
 from django.shortcuts import render
 from django.utils import timezone
-from rest_framework import status
-from rest_framework.generics import CreateAPIView
+from rest_framework import status, permissions
+from rest_framework.generics import CreateAPIView, ListAPIView
 from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.exceptions import PermissionDenied
+from .permissions import IsGroupMember
 
-from .models import User, UserOtpCode
+
+from .models import User, UserOtpCode, UserMessage, Groups
 from .serializers import (
-    GoogleSocialAuthSerializer,
+    GoogleSerializer,
+    FacebookSerializer,
     UserOtpCodeVerifySerializer,
     UserRegisterSerializer,
+    UserMessageSerializer
 )
 from .utils import generate_otp_code, send_verification_code
 
@@ -78,6 +84,40 @@ class UserRegisterVerifyView(CreateAPIView):
             )
 
 
-class GoogleRegisterView(CreateAPIView):
+class GoogleAuth(APIView):
+    def get(self, request, *args, **kwargs):
+        auth_token = str(request.query_params.get('code'))
+        ser = GoogleSerializer(data={'auth_token': auth_token})
+        if ser.is_valid():
+            return Response(ser.data)
+        return Response(ser.errors, status=400)
+ 
+
+class FacebookAuth(CreateAPIView):
     queryset = User.objects.all()
-    serializer_class = GoogleSocialAuthSerializer
+    serializer_class = FacebookSerializer
+ 
+
+
+class UserMessageCreateApi(CreateAPIView):
+    queryset = UserMessage.objects.all()
+    serializer_class = UserMessageSerializer
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
+
+    def perform_create(self, serializer):
+        group = serializer.validated_data['group']
+        if self.request.user not in group.users.all():
+            raise PermissionDenied("You are not a member of this group.")
+        serializer.save(user=self.request.user)
+
+class MessageListApi(ListAPIView):
+    serializer_class = UserMessageSerializer
+    permission_classes = [permissions.IsAuthenticated, IsGroupMember]
+
+    def get_queryset(self):
+        group_id = self.kwargs['group_id']
+        group = Groups.objects.get(pk=group_id)
+        if self.request.user not in group.users.all():
+            raise PermissionDenied("You are not a member of this group.")
+        return UserMessage.objects.filter(group=group)
+

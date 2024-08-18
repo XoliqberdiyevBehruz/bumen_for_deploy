@@ -1,9 +1,16 @@
 import sentry_sdk
+import requests
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
+from rest_framework.exceptions import APIException
 
-from account.auth import google, register
-from account.models import SocialUser, User
+
+from account.auth import google, register, facebook
+from django.conf import settings
+from common.serializers import MediaURlSerializer
+
+
+from account.models import SocialUser, User, UserMessage
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -17,36 +24,99 @@ class UserOtpCodeVerifySerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
 
 
-class GoogleSocialAuthSerializer(serializers.Serializer):
+class GoogleSerializer(serializers.Serializer):
     auth_token = serializers.CharField()
 
     def validate_auth_token(self, auth_token):
-        try:
-            user_data = google.Google.validate(auth_token)
-            try:
-                user_data["sub"]
-            except Exception:
-                sentry_sdk.capture_exception(user_data)
-                raise serializers.ValidationError(
-                    _("The token is invalid or expired. Please login again.")
-                )
+        
+        token_url = 'https://oauth2.googleapis.com/token'
+        payload = {
+            'code': auth_token,
+            'client_id': settings.GOOGLE_CLIENT_ID,
+            'client_secret': settings.GOOGLE_CLIENT_SECRET,
+            'redirect_uri': settings.GOOGLE_REDIRECT_URI,
+            'grant_type': settings.GOOGLE_GRANT_TYPE,
+        }
+        headers = {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        }
 
-            user_id = user_data["sub"]
-            email = user_data["email"]
-            provider = SocialUser.RegisterType.GOOGLE
-            first_name = (
-                user_data["given_name"]
-                if "given_name" in user_data
-                else user_data["email"]
-            )
-            last_name = user_data["family_name"] if "family_name" in user_data else ""
+        response = requests.post(token_url, data=payload, headers=headers)
+
+
+        if response.status_code == 200:
+            id_token_str = response.json()['id_token'] 
+            user_data = google.Google.validated(id_token_str)
+
+        else:
+            raise Exception(f'Error fetching token: {response.json()}')
+
+        if not auth_token:
+            raise APIException('Код авторизации отсутствует')
+        if not user_data:
+            raise APIException('Ошибка верификации токена Google')
+
+
+
+        email = user_data.get("email")
+        first_name = user_data.get("given_name", "")
+        last_name = user_data.get("family_name", "")
+        photo = user_data.get("picture", None)
+        birthday = user_data.get("birthday", None)
+        username = first_name + last_name
+
+        try:
             return register.register_social_user(
-                provider=provider,
-                user_id=user_id,
+                auth_type=User.AuthType.GOOGLE,
                 email=email,
                 first_name=first_name,
                 last_name=last_name,
+                birthday=birthday,
+                username=username,
+                photo=photo,
             )
         except Exception as e:
-            sentry_sdk.capture_exception(e)
-            raise serializers.ValidationError(e)
+            raise serializers.ValidationError(f'Ошибка при регистрации пользователя: {e}')
+        
+
+class FacebookSerializer(serializers.Serializer):
+    auth_token = serializers.CharField()
+
+    def validate_auth_token(self, auth_token):
+        user_data = facebook.Facebook.validated(auth_token=auth_token)
+
+        email = user_data.get("email")
+        first_name = user_data.get("given_name", "")
+        last_name = user_data.get("family_name", "")
+        photo = user_data.get("picture", None)
+        birthday = user_data.get("birthday", None)
+        username = first_name + last_name
+
+        try:
+            return register.register_social_user(
+                auth_type=User.AuthType.FACEBOOK,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                birthday=birthday,
+                username=username,
+                photo=photo,
+            )
+        except Exception as e:
+            raise serializers.ValidationError(f'Ошибка при регистрации пользователя: {e}')
+        
+
+class UserSerializer(serializers.ModelSerializer):
+    photo = MediaURlSerializer(read_only=True)
+
+    class Meta:
+        model = User
+        fields = ("first_name", "last_name", "email", "photo", "birth_date")
+
+
+
+
+class UserMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserMessage
+        fields = '__all__'
