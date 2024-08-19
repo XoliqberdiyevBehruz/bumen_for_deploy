@@ -4,9 +4,10 @@ from supject.serializers import CategorySerializer, SubjectSerializer
 from django.urls import reverse
 from rest_framework import status
 
+
 class TestSubject(APITestCase):
     def test_category_list(self):
-        categories =  Category.objects.bulk_create([
+        categories = Category.objects.bulk_create([
             Category(name='Cat 1', click_count=0),
             Category(name='Cat 2', click_count=0),
             Category(name='Cat 3', click_count=0),
@@ -94,4 +95,5 @@ class TestSubject(APITestCase):
 #         # self.assertEqual(len(response.data[0]['subject_titles'][0]['subjects']), 1)
 #         # self.assertEqual(response.data[0]['subject_titles'][0]['subjects'][0]['name'], 'Test Subject')
 #         # self.assertEqual(response.data[0]['subject_titles'][0]['subjects'][0]['type'], 'local')
+
 

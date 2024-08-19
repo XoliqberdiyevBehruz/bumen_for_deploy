@@ -9,6 +9,7 @@ from .views import (
     StartSubjectApi,
     StepDetailAPIView,
     SubjectTitleApiView,
+    GetTestResultsView,
 )
 
 urlpatterns = [
@@ -24,4 +25,5 @@ urlpatterns = [
     path("steps/start-test/", StartStepTestView.as_view(), name="step-start-test"),
     path("clubs/", UserClubsView.as_view(), name='clubs'),
     path("club/<int:pk>/", ClubDetail.as_view(), name='club'),
-]
+    path("subject/get-test/", GetTestResultsView.as_view(), name='get_test'),
+    ]

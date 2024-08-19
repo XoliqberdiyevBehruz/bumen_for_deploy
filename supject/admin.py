@@ -18,6 +18,7 @@ from .models import (
     Vacancy,
 )
 
+
 admin.site.register(TestQuestion)
 admin.site.register(TestAnswer)
 admin.site.register(UserTotalTestResult)
@@ -61,7 +62,6 @@ class SubjectAdmin(admin.ModelAdmin):
 @admin.register(UserSubject)
 class UserSubjectAdmin(admin.ModelAdmin):
     list_display = ("id", "user")
-
 
 @admin.register(StepFile)
 class StepFileAdmin(admin.ModelAdmin):

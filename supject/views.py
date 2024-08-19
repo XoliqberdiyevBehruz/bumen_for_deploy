@@ -73,6 +73,7 @@ class SubjectTitleApiView(ListAPIView):
     queryset = SubjectTitle.objects.all()
     serializer_class = SubjectTitleSerializer
 
+
     @swagger_auto_schema(manual_parameters=[category_id])
     def get(self, request, *args, **kwargs):
         query_param = request.query_params.get("category_id", None)
@@ -276,3 +277,19 @@ class StepTestFinishView(CreateAPIView):
             "questions": "",
         }
         return Response(data=data)
+
+
+class GetTestResultsView(RetrieveAPIView):
+    queryset = UserTotalTestResult.objects.all()
+    serializer_class = UserTotalTestResultSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        result_id = kwargs.get('result_id')
+        try:
+            test_result = self.queryset.get(id=result_id, user=request.user)
+            serializer = self.serializer_class(test_result)
+            return Response(serializer.data)
+        except UserTotalTestResult.DoesNotExist:
+            return Response({"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND)
+

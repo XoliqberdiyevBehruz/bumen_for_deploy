@@ -13,12 +13,15 @@ from supject.models import (
     TestAnswer,
     TestQuestion,
     UserSubject,
+    UserTestResult,
+    UserTotalTestResult,
 )
 
 
 class StepSerializer(serializers.ModelSerializer):
     class Meta:
         model = Step
+
         fields = [
             "id",
         ]
@@ -127,3 +130,22 @@ class FinishTestQuestionSerializer(serializers.Serializer):
 class StepTestFinishSerializer(serializers.Serializer):
     result_id = serializers.IntegerField(required=True)
     questions = serializers.ListField(source=FinishTestQuestionSerializer())
+
+
+class UserTestResultSerializer(serializers.ModelSerializer):
+    test_question = serializers.StringRelatedField()
+    test_answers = TestAnswerSerializer(many=True)
+
+    class Meta:
+        model = UserTestResult
+        fields = ['id', 'test_question', 'test_answers']
+
+
+class UserTotalTestResultSerializer(serializers.ModelSerializer):
+    user_test_results = UserTestResultSerializer(many=True)
+
+    class Meta:
+        model = UserTotalTestResult
+        fields = ['id', 'step_test', 'user', 'ball', 'correct_answers', 'user_test_results', 'finished', 'percentage']
+        read_only_fields = ['id', 'user', 'step_test']
+
