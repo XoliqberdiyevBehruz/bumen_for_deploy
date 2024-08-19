@@ -29,6 +29,9 @@ class User(AbstractUser):
     )
     telegram_id = models.CharField(_("telegram id"))
     objects = CustomUserManager()
+    device_id = models.CharField(
+        _("device id"), unique=True, max_length=244, null=True, blank=True
+    )
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
 
