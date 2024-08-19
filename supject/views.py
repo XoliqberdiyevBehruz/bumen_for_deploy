@@ -168,57 +168,6 @@ class StartStepTestView(CreateAPIView):
             raise APIException(e)
 
 
-<<<<<<< HEAD
-class SubmitTestsView(CreateAPIView):
-    permission_classes = [IsAuthenticated]
-
-    def post(self, request, *args, **kwargs):
-        try:
-            result_id = request.data.get("result_id")
-            answers = request.data.get("answers", [])
-
-            user_test_result = UserTotalTestResult.objects.get(id=result_id, user=request.user)
-            step_test = user_test_result.step_test
-            total_ball = 0
-            correct_answers_count = 0
-
-            for answer in answers:
-                question_id = answer.get("question_id")
-                answer_id = answer.get("answer_id")
-
-                question = TestQuestion.objects.get(id=question_id, steptest=step_test)
-                selected_answer = TestAnswer.objects.get(id=answer_id, test_quetion=question)
-
-                is_correct = selected_answer.is_correct
-                UserTestResult.objects.create(
-                    user_test_result=user_test_result,
-                    question=question,
-                    answer=selected_answer,
-                    is_correct=is_correct
-                )
-
-                if is_correct:
-                    correct_answers_count += 1
-                    total_ball += step_test.ball_for_each_test
-
-            user_test_result.ball = total_ball
-            user_test_result.correct_answers = correct_answers_count
-            user_test_result.save(update_fields=["ball", "correct_answers"])
-
-            user_step = UserStep.objects.get(user=request.user, step=step_test.step)
-            user_step.finished = True
-            user_step.save(update_fields=["finished"])
-
-            data = {
-                "message": "Test submitted successfully",
-                "total_ball": total_ball,
-                "correct_answers": correct_answers_count,
-            }
-            return Response(data=data)
-
-        except Exception as e:
-            raise APIException(str(e))
-=======
 class UserClubsView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -328,4 +277,19 @@ class StepTestFinishView(CreateAPIView):
             "questions": "",
         }
         return Response(data=data)
->>>>>>> ea86244cf895a7c4f5643854973d3f9d5061833b
+
+
+class GetTestResultsView(RetrieveAPIView):
+    queryset = UserTotalTestResult.objects.all()
+    serializer_class = UserTotalTestResultSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        result_id = kwargs.get('result_id')
+        try:
+            test_result = self.queryset.get(id=result_id, user=request.user)
+            serializer = self.serializer_class(test_result)
+            return Response(serializer.data)
+        except UserTotalTestResult.DoesNotExist:
+            return Response({"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND)
+

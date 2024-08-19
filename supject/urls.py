@@ -9,7 +9,7 @@ from .views import (
     StartSubjectApi,
     StepDetailAPIView,
     SubjectTitleApiView,
-    SubmitTestsView,
+    GetTestResultsView,
 )
 
 urlpatterns = [
@@ -22,11 +22,8 @@ urlpatterns = [
     path("subject-titles/", SubjectTitleApiView.as_view(), name="subject-titles"),
     path("categories/", CategoryListView.as_view(), name="categories"),
     path("steps/<int:pk>/", StepDetailAPIView.as_view(), name="step-detail"),
-<<<<<<< HEAD
-    path("steps/submit-test/", SubmitTestsView.as_view(), name="submit-test"),
-=======
     path("steps/start-test/", StartStepTestView.as_view(), name="step-start-test"),
     path("clubs/", UserClubsView.as_view(), name='clubs'),
     path("club/<int:pk>/", ClubDetail.as_view(), name='club'),
->>>>>>> ea86244cf895a7c4f5643854973d3f9d5061833b
-]
+    path("subject/get-test/", GetTestResultsView.as_view(), name='get_test'),
+    ]
