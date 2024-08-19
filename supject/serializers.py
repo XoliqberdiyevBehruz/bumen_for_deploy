@@ -1,8 +1,11 @@
 from rest_framework import serializers
 
+from account.serializers import UserSerializer
 from common.serializers import MediaURlSerializer
 from supject.models import (
     Category,
+    Club,
+    ClubMeeting,
     Step,
     StepFile,
     Subject,
@@ -47,9 +50,11 @@ class UserSubjectSerializer(serializers.ModelSerializer):
 
 
 class SubjectTitleSerializer(serializers.ModelSerializer):
+    subjects = SubjectSerializer(many=True, read_only=True)
+
     class Meta:
         model = SubjectTitle
-        fields = ["id", "name", "category"]
+        fields = ["id", "name", "category", "subjects"]
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -98,3 +103,28 @@ class StepTestQuestionTestSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestQuestion
         fields = ("id", "question_type", "question", "test_answers")
+
+
+class ClubSerializer(serializers.ModelSerializer):
+    subject = SubjectSerializer(read_only=True)
+    users = UserSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Club
+        fields = ("id", "name", "users", "subject", "description")
+
+
+class ClubMeetingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ClubMeeting
+        fields = "__all__"
+
+
+class FinishTestQuestionSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField(required=True)
+    answer_ids = serializers.ListField(source=serializers.IntegerField())
+
+
+class StepTestFinishSerializer(serializers.Serializer):
+    result_id = serializers.IntegerField(required=True)
+    questions = serializers.ListField(source=FinishTestQuestionSerializer())

@@ -10,13 +10,16 @@ from rest_framework.generics import (
     RetrieveAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import supject.serializers
 from account.models import User
+from common import error_codes
 from supject.models import *
 from supject.serializers import *
+from supject.utils import calculate_test_ball
 
 category_id = openapi.Parameter(
     name="category_id", in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER
@@ -59,6 +62,9 @@ class StartSubjectApi(APIView):
         if created:
             user_subject.started = True
             user_subject.save()
+        club = Club.objects.get(subject=subject)
+        club.users.add(user)
+        club.save()
         subject_serializer = UserSubjectSerializer(user_subject)
         return Response(data=subject_serializer.data, status=status.HTTP_200_OK)
 
@@ -162,6 +168,7 @@ class StartStepTestView(CreateAPIView):
             raise APIException(e)
 
 
+<<<<<<< HEAD
 class SubmitTestsView(CreateAPIView):
     permission_classes = [IsAuthenticated]
 
@@ -211,3 +218,114 @@ class SubmitTestsView(CreateAPIView):
 
         except Exception as e:
             raise APIException(str(e))
+=======
+class UserClubsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, req: Request):
+        user = User.objects.get(email=req.user)
+
+        user_subjects = UserSubject.objects.filter(user=user)
+
+        if not user_subjects.exists():
+            return Response(
+                {"error": "You do not have subjects so we can not enter you to club"},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        clubs = []
+        for i in user_subjects:
+            clubs.append(ClubSerializer(Club.objects.get(subject=i.subject)).data)
+
+        return Response({"user": UserSerializer(user).data, "clubs": clubs})
+
+
+class ClubDetail(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, req: Request, pk):
+        try:
+            club = Club.objects.get(pk=pk)
+            meetings = ClubMeeting.objects.filter(club=club)
+
+            return Response(
+                {
+                    "club": ClubSerializer(club).data,
+                    "meetings": ClubMeetingSerializer(meetings, many=True).data,
+                }
+            )
+        except Exception as e:
+            raise APIException(e)
+
+
+class StepTestFinishView(CreateAPIView):
+    queryset = UserTotalTestResult.objects.all()
+    serializer_class = StepTestFinishSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_total_test_result = self.queryset.filter(
+            id=serializer.validated_data["result_id"], user=request.user, finished=False
+        )
+        if not user_total_test_result.exists():
+            return Response(
+                data={"message": error_codes.USER_TOTAL_TEST_RESULT_MSG},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+        questions = serializer.validated_data["questions"]
+        total_ball = 0
+        for qst in questions:
+            question_ball = 0
+            question = TestQuestion.objects.get(id=qst["question_id"])
+            user_test_result = UserTestResult.objects.create(
+                user=request.user, test_question=question
+            )
+            if question.question_type == TestQuestion.QuestionType.MULTIPLE:
+                answers = question.answers.filter(id__in=qst["answer_ids"])
+                for ans in answers:
+                    user_test_result.test_answers.add(ans)
+                    if ans.is_correct == True:
+                        question_ball += calculate_test_ball(
+                            question.question_type,
+                            user_total_test_result.step_test.ball_for_each_test,
+                        )
+                    else:
+                        continue
+            else:
+                answer = question.answers.filter(id__in=qst["answer_ids"]).last()
+                user_test_result.test_answers.add(answer)
+                if answer.is_correct == True:
+                    question_ball += calculate_test_ball(
+                        question.question_type,
+                        user_total_test_result.step_test.ball_for_each_test,
+                    )
+
+            total_ball += question_ball
+
+            if not answers.exists():
+                return Response(
+                    data={"message": error_codes.TEST_ANSWERS_NOT_EXISTS},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        percentage = total_ball * 100 // len(questions)
+        user_total_test_result.percentage = percentage
+        user_total_test_result.ball = total_ball
+        user_total_test_result.save()
+        user_results = UserTestResult.objects.filter(
+            user=request.user, total_result=user_total_test_result
+        )
+
+        data = {
+            "total_max_ball": len(questions)
+            * user_total_test_result.step_test.ball_for_each_test,
+            "ball": user_total_test_result.ball,
+            "percentage": user_total_test_result.percentage,
+            "correct_answers_count": user_results.filter(test_answers__is_correct=True),
+            "incorrect_answers_count": user_results.filter(
+                test_answers__is_correct=False
+            ),
+            "questions": "",
+        }
+        return Response(data=data)
+>>>>>>> ea86244cf895a7c4f5643854973d3f9d5061833b
