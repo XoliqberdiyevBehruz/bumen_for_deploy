@@ -266,7 +266,7 @@ class UserTotalTestResult(models.Model):
         verbose_name=_("Test Results"), to=UserTestResult, related_name="testresults"
     )
     finished = models.BooleanField(default=False)
-    percenateg = models.IntegerField()
+    percentage = models.IntegerField()
 
     def __str__(self) -> str:
         return f"{self.pk} - {self.user.username}"
