@@ -151,7 +151,7 @@ class UserTotalTestResultSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'user', 'step_test']
 
 class UserTestsResultIDSerializer(serializers.Serializer):
-    id = serializers.IntegerField(required=True)
+    result_id = serializers.IntegerField(required=True)
 
 
 class VacancySerializer(serializers.ModelSerializer):
