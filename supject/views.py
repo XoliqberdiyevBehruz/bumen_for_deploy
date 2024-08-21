@@ -302,7 +302,6 @@ class GetTestResultsView(RetrieveAPIView):
             )
 
 
-
 class VacancyList(APIView):
     permission_classes = [IsAuthenticated]
     
@@ -318,6 +317,7 @@ class VacancyList(APIView):
         except:
             return Response({'error': 'This result was not found'}, status=status.HTTP_404_NOT_FOUND)
         
+
 
 
 class UserPopularSubject(APIView):
