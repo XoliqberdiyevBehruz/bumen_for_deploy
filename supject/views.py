@@ -27,16 +27,23 @@ category_id = openapi.Parameter(
 
 
 class CategoryListView(ListAPIView):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by("click_count")
     serializer_class = CategorySerializer
 
 
+
 class CategoryAPIView(APIView):
-    def get(self, request, pk):
-        categories = Category.objects.all().order_by("-click_count")
-        # orderby clicked_count buyicha
-        categories_serializer = CategorySerializer(categories, many=True)
-        return Response(categories_serializer.data, status=status.HTTP_200_OK)
+    def get(self, request: Request, pk):
+        try:
+            category = Category.objects.get(pk=pk)
+            category.click_count += 1
+            category.save()
+            category_serializer = CategorySerializer(category)
+            return Response(category_serializer.data, status=status.HTTP_200_OK)
+        
+        except:
+            return Response({'error': 'Category was not found'}, status=status.HTTP_404_NOT_FOUND)
+     
 
 
 class SubjectListView(ListAPIView):
@@ -292,4 +299,5 @@ class GetTestResultsView(RetrieveAPIView):
             return Response(serializer.data)
         except UserTotalTestResult.DoesNotExist:
             return Response({"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND)
+
 
