@@ -17,7 +17,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categorys")
-
+    
 
 class SubjectTitle(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=200)

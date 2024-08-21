@@ -190,8 +190,15 @@ class SubjectSearchApiView(ListAPIView):
         query_param = request.query_params.get("query", None)
         if not query_param:
             return Response(data=[])
-        subject_titles = SubjectTitle.objects.filter(name__contains=query_param)
-        subject_categories = SubjectTitle.objects.filter(name__contains=query_param)
-        serializer = SubjectTitleListSerializer(subject_titles, many=True)
-        serializer = SubjectTitleListSerializer(subject_categories, many=True)
-        return Response(data=serializer.data)
+
+        subject_titles = SubjectTitle.objects.filter(name__icontains=query_param)
+        subject_categories = Category.objects.filter(name__icontains=query_param)
+
+        subject_titles_serializer = SubjectSearchSerializer(subject_titles, many=True)
+        subject_categories_serializer = CategorySearchSerializer(subject_categories, many=True)
+
+        data = {
+            "subject_titles": subject_titles_serializer.data,
+            "subject_categories": subject_categories_serializer.data
+        }
+        return Response(data=data)

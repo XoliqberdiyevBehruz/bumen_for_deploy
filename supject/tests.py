@@ -56,7 +56,6 @@ class TestUserPopularSubject(APITestCase):
         
 
 class TestSubjectView(APITestCase):
-
     def setUp(self):
         
         self.category1 = Category.objects.create(name="Category1", click_count=1)
@@ -75,4 +74,3 @@ class TestSubjectView(APITestCase):
         count = SubjectTitle.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(count, 2)
-

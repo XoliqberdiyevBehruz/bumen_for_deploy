@@ -108,8 +108,14 @@ class UserPopularSubjectSerializer(serializers.ModelSerializer):
         
         
 class SubjectSearchSerializer(serializers.ModelSerializer):
-    start_count = serializers.IntegerField()
 
     class Meta:
         model = SubjectTitle
-        fields = ('id', 'name', 'type', 'subject_title', 'start_count')
+        fields = ('id', 'name', 'category')
+        
+        
+class CategorySearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'click_count')
