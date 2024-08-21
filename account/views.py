@@ -110,7 +110,7 @@ class UserMessageCreateApi(CreateAPIView):
 
     def perform_create(self, serializer):
         group = serializer.validated_data["group"]
-        if self.request.user not in group.users.all():
+        if not group.users.filter(id=self.request.user.id).exists():
             raise PermissionDenied("You are not a member of this group.")
         serializer.save(user=self.request.user)
 

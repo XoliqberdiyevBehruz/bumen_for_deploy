@@ -4,13 +4,16 @@ from .views import (
     CategoryAPIView,
     CategoryListView,
     ClubDetail,
-    UserClubsView,
+    GetTestResultsView,
     StartStepTestView,
     StartSubjectApi,
     StepDetailAPIView,
     SubjectTitleApiView,
     GetTestResultsView,
-    VacancyList
+    VacancyList,
+    UserClubsView,
+    UserPopularSubject,
+
 )
 
 urlpatterns = [
@@ -27,6 +30,16 @@ urlpatterns = [
     path("clubs/", UserClubsView.as_view(), name='clubs'),
     path("club/<int:pk>/", ClubDetail.as_view(), name='club'),
     path("subject/get-test/", GetTestResultsView.as_view(), name='get_test'),
-    path('vacancy/<int:pk>', VacancyList.as_view(), name='vacancy')
+    path('vacancy/<int:pk>', VacancyList.as_view(), name='vacancy'),
+
+
+    path("clubs/", UserClubsView.as_view(), name="clubs"),
+    path("club/<int:pk>/", ClubDetail.as_view(), name="club"),
+    path("subject/get-test/", GetTestResultsView.as_view(), name="get_test"),
+    path(
+        "user-popular_subjects/",
+        UserPopularSubject.as_view(),
+        name="user-popular-subjects",
+    ),
 
 ]
