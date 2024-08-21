@@ -1,4 +1,4 @@
-from django.db.models import Count, Q
+from django.db.models import Count, Q, F
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -27,7 +27,7 @@ category_id = openapi.Parameter(
 
 
 class CategoryListView(ListAPIView):
-    queryset = Category.objects.all().order_by("click_count")
+    queryset = Category.objects.all().order_by("-click_count")
     serializer_class = CategorySerializer
 
 
@@ -35,14 +35,14 @@ class CategoryListView(ListAPIView):
 class CategoryAPIView(APIView):
     def get(self, request: Request, pk):
         try:
+            category = Category.objects.filter(pk=pk).update(click_count=F('click_count') + 1)
             category = Category.objects.get(pk=pk)
-            category.click_count += 1
-            category.save()
+
             category_serializer = CategorySerializer(category)
             return Response(category_serializer.data, status=status.HTTP_200_OK)
         
-        except:
-            return Response({'error': 'Category was not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'error': f'Category was not found {e}'}, status=status.HTTP_404_NOT_FOUND)
      
 
 
