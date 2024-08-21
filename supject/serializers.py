@@ -15,6 +15,7 @@ from supject.models import (
     UserSubject,
     UserTestResult,
     UserTotalTestResult,
+    Vacancy,
 )
 
 
@@ -149,3 +150,14 @@ class UserTotalTestResultSerializer(serializers.ModelSerializer):
         fields = ['id', 'step_test', 'user', 'ball', 'correct_answers', 'user_test_results', 'finished', 'percentage']
         read_only_fields = ['id', 'user', 'step_test']
 
+class UserTestsResultIDSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=True)
+
+
+class VacancySerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+
+    
+    class Meta:
+        model = Vacancy
+        fields = ('name', 'category', 'description')

@@ -301,3 +301,18 @@ class GetTestResultsView(RetrieveAPIView):
             return Response({"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND)
 
 
+class VacancyList(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, req: Request, pk):
+        try:
+            result = UserTotalTestResult.objects.get(pk=pk)
+            category = UserSubject.objects.get(user=result.user).subject.subject_title.category
+
+            vacancies = Vacancy.objects.filter(category=category)
+
+            return Response(VacancySerializer(vacancies).data)
+        
+        except:
+            return Response({'error': 'This result was not found'}, status=status.HTTP_404_NOT_FOUND)
+        
