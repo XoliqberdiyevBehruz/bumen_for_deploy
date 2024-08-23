@@ -11,6 +11,8 @@ class Category(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=100, unique=True)
     click_count = models.PositiveIntegerField(verbose_name=_("Click Count"), default=0)
 
+
+
     def __str__(self) -> str:
         return self.name
 
@@ -99,7 +101,7 @@ class Club(models.Model):
         verbose_name=_("Subject"), to=Subject, on_delete=models.CASCADE
     )
     users = models.ManyToManyField(
-        verbose_name=_("Users"), to=User, related_name="clubusers"
+        verbose_name=_("Users"), to=User, related_name="clubusers", blank=True
     )
     description = models.TextField(verbose_name=_("Description"))
 
@@ -192,7 +194,10 @@ class TestQuestion(models.Model):
         MEDIUM = "medium", _("medium")
         HARD = "hard", _("hard")
 
-    QUESTION_TYPE_CHOICE = (("multiple", _("Multiple")), ("single", _("Single")))
+    class QuestionType(models.TextChoices):
+        MULTIPLE = "multiple", _("Multiple")
+        SINGLE = "single", _("Single")
+
     steptest = models.ForeignKey(
         verbose_name=_("Step test"),
         to=StepTest,
@@ -200,7 +205,7 @@ class TestQuestion(models.Model):
         related_name="test_questions",
     )
     question_type = models.CharField(
-        verbose_name=_("Question type"), max_length=30, choices=QUESTION_TYPE_CHOICE
+        verbose_name=_("Question type"), max_length=30, choices=QuestionType.choices
     )
     question = CKEditor5Field(_("question"), config_name="extends")
     level = models.CharField(
@@ -234,12 +239,13 @@ class TestAnswer(models.Model):
 
 
 class UserTestResult(models.Model):
+    total_result = models.ForeignKey(
+        "UserTotalTestResult", on_delete=models.CASCADE, related_name="total_results"
+    )
     test_question = models.ForeignKey(
         verbose_name=_("Question"), to=TestQuestion, on_delete=models.CASCADE
     )
-    test_answer = models.ForeignKey(
-        verbose_name=_("Answer"), to=TestAnswer, on_delete=models.CASCADE
-    )
+    test_answers = models.ManyToManyField(TestAnswer)
     user = models.ForeignKey(verbose_name=_("Users"), to=User, on_delete=models.CASCADE)
 
     def __str__(self) -> str:
@@ -263,6 +269,7 @@ class UserTotalTestResult(models.Model):
         verbose_name=_("Test Results"), to=UserTestResult, related_name="testresults"
     )
     finished = models.BooleanField(default=False)
+    percentage = models.IntegerField()
 
     def __str__(self) -> str:
         return f"{self.pk} - {self.user.username}"
