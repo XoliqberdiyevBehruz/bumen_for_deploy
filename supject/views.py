@@ -308,6 +308,8 @@ class VacancyList(APIView):
     def get(self, req: Request, pk):
         try:
             result = UserTotalTestResult.objects.get(pk=pk)
+            if not result.percentage >= 60:
+                return Response({'error': 'You bal procent must be more than 60 !!!!'})
             category = UserSubject.objects.get(user=result.user).subject.subject_title.category
 
             vacancies = Vacancy.objects.filter(category=category)
