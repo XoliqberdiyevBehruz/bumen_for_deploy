@@ -339,3 +339,15 @@ class UserPopularSubject(APIView):
 
         serializer = SubjectSerializer(subjects, many=True)
         return Response(serializer.data)
+
+
+class TopUserList(APIView):
+    def get(self, req: Request):
+        users = User.objects.all()
+
+        sorted_users = sorted(users, key=lambda user: user.user_total_bal, reverse=True)
+
+        return Response(UserSerializer(sorted_users, many=True))
+
+        
+        

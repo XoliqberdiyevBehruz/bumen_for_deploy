@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
+from supject.models import UserTotalTestResult
+from django.db.models import Sum
 
 from common.models import Media
 
@@ -44,6 +46,14 @@ class User(AbstractUser):
 
     def get_token(self):
         return RefreshToken.access_token
+    
+    @property
+    def user_total_bal(self):
+        filtered_user_results = UserTotalTestResult.objects.filter(user=self)
+        total_bal = filtered_user_results.aggregate(total_ball=Sum("ball"))['total_ball'] / filtered_user_results.count()
+
+        return total_bal
+
 
 
 class UserOtpCode(models.Model):

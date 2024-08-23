@@ -13,6 +13,7 @@ from .views import (
     VacancyList,
     UserClubsView,
     UserPopularSubject,
+    TopUserList,
 
 )
 
@@ -41,5 +42,6 @@ urlpatterns = [
         UserPopularSubject.as_view(),
         name="user-popular-subjects",
     ),
+    path("tops/", TopUserList.as_view(), name='tops'),
 
 ]
