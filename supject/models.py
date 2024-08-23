@@ -17,7 +17,7 @@ class Category(models.Model):
     class Meta:
         verbose_name = _("Category")
         verbose_name_plural = _("Categorys")
-
+    
 
 class SubjectTitle(models.Model):
     name = models.CharField(verbose_name=_("Name"), max_length=200)
@@ -59,22 +59,23 @@ class Subject(models.Model):
 
 class UserSubject(models.Model):
     subject = models.ForeignKey(
-        verbose_name=_("Subject"), to=Subject, on_delete=models.CASCADE
+        verbose_name=_("Subject"), to=Subject, on_delete=models.CASCADE, related_name='user_subjects'
     )
     user = models.ForeignKey(verbose_name=_("User"), to="account.User", on_delete=models.CASCADE)
     total_test_ball = models.PositiveIntegerField(
-        verbose_name=_("Total test bal"), default=0.0
+        verbose_name=_("Total test ball"), default=0
     )
     started_time = models.DateTimeField(auto_now_add=True)
     started = models.BooleanField(default=False)
 
     def __str__(self) -> str:
-        return f"{self.user.username} - {self.subject.name}"
+        return f"{self.user.email} - {self.subject.name}"
 
     class Meta:
         verbose_name = _("User's subject")
         verbose_name_plural = _("User's subjects")
         unique_together = ("user", "subject")
+
 
 
 class Vacancy(models.Model):

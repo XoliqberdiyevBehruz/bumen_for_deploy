@@ -1,14 +1,9 @@
-from django.db.models import Count, Q, F
+from django.db.models import Count, F, Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
-from rest_framework.generics import (
-    CreateAPIView,
-    ListAPIView,
-    ListCreateAPIView,
-    RetrieveAPIView,
-)
+from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -25,25 +20,30 @@ category_id = openapi.Parameter(
     name="category_id", in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER
 )
 
+query = openapi.Parameter(name="query", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING)
+
 
 class CategoryListView(ListAPIView):
     queryset = Category.objects.all().order_by("-click_count")
     serializer_class = CategorySerializer
 
 
-
 class CategoryAPIView(APIView):
     def get(self, request: Request, pk):
         try:
-            category = Category.objects.filter(pk=pk).update(click_count=F('click_count') + 1)
+            category = Category.objects.filter(pk=pk).update(
+                click_count=F("click_count") + 1
+            )
             category = Category.objects.get(pk=pk)
 
             category_serializer = CategorySerializer(category)
             return Response(category_serializer.data, status=status.HTTP_200_OK)
-        
+
         except Exception as e:
-            return Response({'error': f'Category was not found {e}'}, status=status.HTTP_404_NOT_FOUND)
-     
+            return Response(
+                {"error": f"Category was not found {e}"},
+                status=status.HTTP_404_NOT_FOUND,
+            )
 
 
 class SubjectListView(ListAPIView):
@@ -172,6 +172,58 @@ class StartStepTestView(CreateAPIView):
             return Response(data=data)
         except Exception as e:
             raise APIException(e)
+
+
+class UserPopularSubject(APIView):
+    def get(self, request):
+        started_subjects = (
+            UserSubject.objects.filter(started=True)
+            .values("subject")
+            .annotate(start_count=Count("subject_id"))
+            .order_by("-start_count")
+        )
+
+        if not started_subjects:
+            return Response({"error": "No subjects found"}, status=404)
+
+        subject_ids = [item["subject"] for item in started_subjects]
+        subjects = Subject.objects.filter(id__in=subject_ids)
+
+        serializer = SubjectSerializer(subjects, many=True)
+
+        for subject in serializer.data:
+            subject_id = subject["id"]
+            subject["start_count"] = next(
+                item["start_count"]
+                for item in started_subjects
+                if item["subject"] == subject_id
+            )
+
+        return Response(serializer.data)
+
+
+class SubjectSearchApiView(ListAPIView):
+    queryset = SubjectTitle.objects.all()
+
+    @swagger_auto_schema(manual_parameters=[query])
+    def get(self, request, *args, **kwargs):
+        query_param = request.query_params.get("query", None)
+        if not query_param:
+            return Response(data=[])
+
+        subject_titles = SubjectTitle.objects.filter(name__icontains=query_param)
+        subject_categories = Category.objects.filter(name__icontains=query_param)
+
+        subject_titles_serializer = SubjectSearchSerializer(subject_titles, many=True)
+        subject_categories_serializer = CategorySearchSerializer(
+            subject_categories, many=True
+        )
+
+        data = {
+            "subject_titles": subject_titles_serializer.data,
+            "subject_categories": subject_categories_serializer.data,
+        }
+        return Response(data=data)
 
 
 class UserClubsView(APIView):
@@ -304,22 +356,24 @@ class GetTestResultsView(RetrieveAPIView):
 
 class VacancyList(APIView):
     permission_classes = [IsAuthenticated]
-    
+
     def get(self, req: Request, pk):
         try:
             result = UserTotalTestResult.objects.get(pk=pk)
             if not result.percentage >= 60:
-                return Response({'error': 'You bal procent must be more than 60 !!!!'})
-            category = UserSubject.objects.get(user=result.user).subject.subject_title.category
+                return Response({"error": "You bal procent must be more than 60 !!!!"})
+            category = UserSubject.objects.get(
+                user=result.user
+            ).subject.subject_title.category
 
             vacancies = Vacancy.objects.filter(category=category)
 
             return Response(VacancySerializer(vacancies).data)
-        
-        except:
-            return Response({'error': 'This result was not found'}, status=status.HTTP_404_NOT_FOUND)
-        
 
+        except:
+            return Response(
+                {"error": "This result was not found"}, status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class UserPopularSubject(APIView):
