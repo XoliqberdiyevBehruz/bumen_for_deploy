@@ -1,3 +1,4 @@
+from django.db.models import Q, Count
 from django.db.models import Count, Q
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
@@ -6,7 +7,6 @@ from rest_framework.exceptions import APIException, ValidationError
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
-    ListCreateAPIView,
     RetrieveAPIView,
 )
 from rest_framework.permissions import IsAuthenticated
@@ -25,6 +25,9 @@ category_id = openapi.Parameter(
     name="category_id", in_=openapi.IN_QUERY, type=openapi.TYPE_INTEGER
 )
 
+query = openapi.Parameter(
+    name="query", in_=openapi.IN_QUERY, type=openapi.TYPE_STRING
+)
 
 class CategoryListView(ListAPIView):
     queryset = Category.objects.all()
@@ -164,6 +167,48 @@ class StartStepTestView(CreateAPIView):
             }
             return Response(data=data)
         except Exception as e:
+            raise APIException(e)       
+
+
+class UserPopularSubject(APIView):
+    def get(self, request):
+        started_subjects = UserSubject.objects.filter(started=True).values('subject').annotate(start_count=Count('subject_id')).order_by('-start_count')
+        
+        if not started_subjects:
+            return Response({'error': 'No subjects found'}, status=404)
+        
+        subject_ids = [item['subject'] for item in started_subjects]
+        subjects = Subject.objects.filter(id__in=subject_ids)
+        
+        serializer = SubjectSerializer(subjects, many=True)
+        
+        for subject in serializer.data:
+            subject_id = subject['id']
+            subject['start_count'] = next(item['start_count'] for item in started_subjects if item['subject'] == subject_id)
+        
+        return Response(serializer.data)
+    
+    
+class SubjectSearchApiView(ListAPIView):
+    queryset = SubjectTitle.objects.all()
+
+    @swagger_auto_schema(manual_parameters=[query])
+    def get(self, request, *args, **kwargs):
+        query_param = request.query_params.get("query", None)
+        if not query_param:
+            return Response(data=[])
+
+        subject_titles = SubjectTitle.objects.filter(name__icontains=query_param)
+        subject_categories = Category.objects.filter(name__icontains=query_param)
+
+        subject_titles_serializer = SubjectSearchSerializer(subject_titles, many=True)
+        subject_categories_serializer = CategorySearchSerializer(subject_categories, many=True)
+
+        data = {
+            "subject_titles": subject_titles_serializer.data,
+            "subject_categories": subject_categories_serializer.data
+        }
+        return Response(data=data)
             raise APIException(e)
 
 
@@ -312,3 +357,4 @@ class UserPopularSubject(APIView):
 
         serializer = SubjectSerializer(subjects, many=True)
         return Response(serializer.data)
+

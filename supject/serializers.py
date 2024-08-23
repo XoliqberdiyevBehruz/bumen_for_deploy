@@ -107,6 +107,27 @@ class StepTestQuestionTestSerializer(serializers.ModelSerializer):
         fields = ("id", "question_type", "question", "test_answers")
 
 
+class UserPopularSubjectSerializer(serializers.ModelSerializer):
+    start_count = serializers.IntegerField()
+
+    class Meta:
+        model = Subject
+        fields = ('id', 'name', 'type', 'subject_title', 'start_count')
+        
+        
+class SubjectSearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = SubjectTitle
+        fields = ('id', 'name', 'category')
+        
+        
+class CategorySearchSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Category
+        fields = ('id', 'name', 'click_count')
+
 class ClubSerializer(serializers.ModelSerializer):
     subject = SubjectSerializer(read_only=True)
     users = UserSerializer(many=True, read_only=True)
@@ -148,4 +169,5 @@ class UserTotalTestResultSerializer(serializers.ModelSerializer):
         model = UserTotalTestResult
         fields = ['id', 'step_test', 'user', 'ball', 'correct_answers', 'user_test_results', 'finished', 'percentage']
         read_only_fields = ['id', 'user', 'step_test']
+
 
