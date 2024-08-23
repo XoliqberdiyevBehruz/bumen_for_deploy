@@ -149,3 +149,9 @@ class UserTotalTestResultSerializer(serializers.ModelSerializer):
         fields = ['id', 'step_test', 'user', 'ball', 'correct_answers', 'user_test_results', 'finished', 'percentage']
         read_only_fields = ['id', 'user', 'step_test']
 
+
+
+
+class JoinGroupSerializer(serializers.Serializer):
+    user_id = serializers.IntegerField()
+    subject_id = serializers.IntegerField()
