@@ -8,7 +8,8 @@ from .views import (
     StepDetailAPIView,
     SubjectTitleApiView,
     UserPopularSubject,
-    SubjectSearchApiView
+    SubjectSearchApiView,
+    UserSubjectListApiView,
 )
 
 urlpatterns = [
@@ -24,4 +25,5 @@ urlpatterns = [
     path("steps/<int:pk>/", StepDetailAPIView.as_view(), name="step-detail"),
     path("steps/start-test/", StartStepTestView.as_view(), name="step-start-test"),
     path("subject-search/", SubjectSearchApiView.as_view(), name="subject-search"),
+    path("user-subject-list/", UserSubjectListApiView.as_view(), name="user-subject-list"),
 ]

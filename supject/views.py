@@ -202,3 +202,12 @@ class SubjectSearchApiView(ListAPIView):
             "subject_categories": subject_categories_serializer.data
         }
         return Response(data=data)
+    
+
+class UserSubjectListApiView(ListAPIView):
+    serializer_class = UserSubjectStartSerializer
+    permission_classes = [IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        return UserSubject.objects.filter(user=user, started=True)

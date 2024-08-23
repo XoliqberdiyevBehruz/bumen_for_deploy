@@ -19,7 +19,7 @@ class User(AbstractUser):
     birth_date = models.DateField(_("birth_date"), null=True, blank=True)
     photo = models.ForeignKey(Media, on_delete=models.SET_NULL, null=True, blank=True)
     email = models.EmailField(_("email address"), unique=True)
-    auth_type = models.CharField(_("auth type"), choices=AuthType.choices, max_length=255, null=True, blank=True)
+    auth_type = models.CharField(_("auth type"), max_length=55,  choices=AuthType.choices, unique=True)
     objects = CustomUserManager()
     USERNAME_FIELD = "email"
     REQUIRED_FIELDS = []
