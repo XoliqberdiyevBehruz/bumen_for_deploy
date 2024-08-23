@@ -12,7 +12,6 @@ class Category(models.Model):
     click_count = models.PositiveIntegerField(verbose_name=_("Click Count"), default=0)
 
 
-
     def __str__(self) -> str:
         return self.name
 

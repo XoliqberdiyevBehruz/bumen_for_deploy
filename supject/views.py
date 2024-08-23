@@ -1,5 +1,6 @@
-from django.db.models import Q, Count
+from django.db.models import Q, Count, F
 from django.db.models import Count, Q
+
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
@@ -30,16 +31,23 @@ query = openapi.Parameter(
 )
 
 class CategoryListView(ListAPIView):
-    queryset = Category.objects.all()
+    queryset = Category.objects.all().order_by("-click_count")
     serializer_class = CategorySerializer
 
 
+
 class CategoryAPIView(APIView):
-    def get(self, request, pk):
-        categories = Category.objects.all().order_by("-click_count")
-        # orderby clicked_count buyicha
-        categories_serializer = CategorySerializer(categories, many=True)
-        return Response(categories_serializer.data, status=status.HTTP_200_OK)
+    def get(self, request: Request, pk):
+        try:
+            category = Category.objects.filter(pk=pk).update(click_count=F('click_count') + 1)
+            category = Category.objects.get(pk=pk)
+
+            category_serializer = CategorySerializer(category)
+            return Response(category_serializer.data, status=status.HTTP_200_OK)
+        
+        except Exception as e:
+            return Response({'error': f'Category was not found {e}'}, status=status.HTTP_404_NOT_FOUND)
+     
 
 
 class SubjectListView(ListAPIView):
@@ -338,6 +346,26 @@ class GetTestResultsView(RetrieveAPIView):
             return Response(
                 {"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND
             )
+
+
+class VacancyList(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, req: Request, pk):
+        try:
+            result = UserTotalTestResult.objects.get(pk=pk)
+            if not result.percentage >= 60:
+                return Response({'error': 'You bal procent must be more than 60 !!!!'})
+            category = UserSubject.objects.get(user=result.user).subject.subject_title.category
+
+            vacancies = Vacancy.objects.filter(category=category)
+
+            return Response(VacancySerializer(vacancies).data)
+        
+        except:
+            return Response({'error': 'This result was not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
 
 
 class UserPopularSubject(APIView):

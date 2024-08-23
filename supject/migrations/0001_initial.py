@@ -1,4 +1,5 @@
 
+
 import django.db.models.deletion
 import django_ckeditor_5.fields
 from django.conf import settings
@@ -33,7 +34,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "click_count",
-                    models.PositiveIntegerField(verbose_name="Click Count"),
+                    models.PositiveIntegerField(default=0, verbose_name="Click Count"),
                 ),
             ],
             options={
