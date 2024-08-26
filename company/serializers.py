@@ -1,6 +1,5 @@
 from rest_framework import serializers
-from .models import FAQ, ContactWithUs
-
+from .models import FAQ, ContactWithUs,Contacts
 
 class ContactWithUsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,3 +14,9 @@ class FAQSerializer(serializers.ModelSerializer):
     class Meta:
         model = FAQ
         fields = ("question", "answer")
+
+
+class ContactsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Contacts
+        fields = '__all__'
