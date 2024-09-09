@@ -12,7 +12,11 @@ from .views import (
     SubjectTitleApiView,
     UserClubsView,
     UserPopularSubject,
+<<<<<<< HEAD
     VacancyList,
+=======
+    JoinDiscussionGroupView
+>>>>>>> a2ae375aadd44468c4111a2f5a31c4c8659fb8c5
 )
 
 urlpatterns = [
@@ -39,4 +43,6 @@ urlpatterns = [
         UserPopularSubject.as_view(),
         name="user-popular-subjects",
     ),
+    path('join_group/<int:user_id>/<int:subject_id>/', JoinDiscussionGroupView.as_view(), name='join_group'),
 ]
+

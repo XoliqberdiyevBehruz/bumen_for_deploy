@@ -5,11 +5,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from account.models import User
+from account.models import User, Groups
 from supject.models import Category, Subject
 from supject.serializers import CategorySerializer, SubjectSerializer
 
-from .models import Category, SubjectTitle, UserSubject
+from .models import Category, SubjectTitle, UserSubject, Subject
+
 
 
 class TestSubject(APITestCase):
@@ -168,6 +169,7 @@ class TestUserPopularSubject(APITestCase):
         # self.assertEqual(response.data, expected_data)
         #
 
+<<<<<<< HEAD
 
 class TestSubjectView(APITestCase):
     def setUp(self):
@@ -191,3 +193,44 @@ class TestSubjectView(APITestCase):
         count = SubjectTitle.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(count, 2)
+=======
+        self.assertEqual(response.data, expected_data)
+
+
+
+
+class JoinDiscussionGroupViewTests(APITestCase):
+    def setUp(self):
+        self.category = Category.objects.create(name="Test Category")
+        self.subject_title = SubjectTitle.objects.create(
+            name="Test Title",
+            category=self.category
+        )
+        self.user = User.objects.create(username="testuser", password="testpassword")
+        self.subject = Subject.objects.create(
+            name="Test Subject",
+            subject_title=self.subject_title,
+            type='global'  
+        )
+        self.user_subject = UserSubject.objects.create(user=self.user, subject=self.subject, finished=True)
+        self.discussion_group = Groups.objects.create(name="Main Discussion Group")
+    
+    def test_join_group_success(self):
+        url = reverse('join_group', args=[self.user.id, self.subject.id])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(self.discussion_group.users.filter(id=self.user.id).exists())
+
+    def test_join_group_not_finished(self):
+        self.user_subject.finished = False
+        self.user_subject.save()
+        url = reverse('join_group', args=[self.user.id, self.subject.id])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_join_group_no_group(self):
+        self.discussion_group.delete()
+        url = reverse('join_group', args=[self.user.id, self.subject.id])
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+>>>>>>> a2ae375aadd44468c4111a2f5a31c4c8659fb8c5
