@@ -3,9 +3,9 @@ from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
-<<<<<<< HEAD
+
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
-=======
+
 from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     CreateAPIView,
@@ -13,7 +13,7 @@ from rest_framework.generics import (
     ListCreateAPIView,
     RetrieveAPIView,
 )
->>>>>>> a2ae375aadd44468c4111a2f5a31c4c8659fb8c5
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -345,8 +345,7 @@ class StepTestFinishView(CreateAPIView):
             "questions": "",
         }
         return Response(data=data)
-
-
+    
 class GetTestResultsView(RetrieveAPIView):
     queryset = UserTotalTestResult.objects.all()
     serializer_class = UserTotalTestResultSerializer
@@ -359,31 +358,14 @@ class GetTestResultsView(RetrieveAPIView):
             serializer = self.serializer_class(test_result)
             return Response(serializer.data)
         except UserTotalTestResult.DoesNotExist:
-            return Response(
-                {"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            raise NotFound("Test result not found")  # or you could use pass or another error handling method
 
-
-class VacancyList(APIView):
+class UserSubjectListApiView(ListAPIView):
+    serializer_class = UserSubjectStartSerializer
     permission_classes = [IsAuthenticated]
-
-    def get(self, req: Request, pk):
-        try:
-            result = UserTotalTestResult.objects.get(pk=pk)
-            if not result.percentage >= 60:
-                return Response({"error": "You bal procent must be more than 60 !!!!"})
-            category = UserSubject.objects.get(
-                user=result.user
-            ).subject.subject_title.category
-
-            vacancies = Vacancy.objects.filter(category=category)
-
-            return Response(VacancySerializer(vacancies).data)
-
-        except:
-            return Response(
-                {"error": "This result was not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+    def get_queryset(self):
+        user = self.request.user
+        return UserSubject.objects.filter(user=user, started=True)
 
 
 class UserPopularSubject(APIView):
@@ -405,8 +387,6 @@ class UserPopularSubject(APIView):
         return Response(serializer.data)
 
 
-
-
 class JoinDiscussionGroupView(APIView):
     def post(self, request, user_id, subject_id):
         user_subject = get_object_or_404(UserSubject, user_id=user_id, subject_id=subject_id)
@@ -420,3 +400,12 @@ class JoinDiscussionGroupView(APIView):
             return Response({"detail": "The user joined the feedback group."}, status=status.HTTP_200_OK)
         else:
             return Response({"detail": "No feedback team was found."}, status=status.HTTP_404_NOT_FOUND)
+
+class TopUserList(APIView):
+    def get(self, req: Request):
+        users = User.objects.all()
+
+        sorted_users = sorted(users, key=lambda user: user.user_total_bal, reverse=True)
+
+        return Response(UserSerializer(sorted_users, many=True))
+

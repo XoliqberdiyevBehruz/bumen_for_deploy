@@ -6,6 +6,9 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from account.models import User, Groups
+from django.urls import reverse
+from rest_framework.test import APITestCase, APIClient
+from account.models import User
 from supject.models import Category, Subject
 from supject.serializers import CategorySerializer, SubjectSerializer
 
@@ -169,7 +172,6 @@ class TestUserPopularSubject(APITestCase):
         # self.assertEqual(response.data, expected_data)
         #
 
-<<<<<<< HEAD
 
 class TestSubjectView(APITestCase):
     def setUp(self):
@@ -177,7 +179,7 @@ class TestSubjectView(APITestCase):
         self.user1 = User.objects.create_user(
             email="user@example.com", password="password"
         )
-
+        
         self.category2 = Category.objects.create(name="Category2", click_count=2)
         self.user2 = User.objects.create_user(
             email="user@example2.com", password="password"
@@ -193,7 +195,7 @@ class TestSubjectView(APITestCase):
         count = SubjectTitle.objects.count()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(count, 2)
-=======
+
         self.assertEqual(response.data, expected_data)
 
 
@@ -233,4 +235,26 @@ class JoinDiscussionGroupViewTests(APITestCase):
         url = reverse('join_group', args=[self.user.id, self.subject.id])
         response = self.client.post(url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
->>>>>>> a2ae375aadd44468c4111a2f5a31c4c8659fb8c5
+
+        
+class TestSubjectListView(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.user1 = User.objects.create(email='admintest1@gmail.com', password='test_password1', auth_type='GOOGLE')
+        self.user2 = User.objects.create(email='admintest2@gmail.com', password='test_password2', auth_type='FACEBOOK')
+        self.user3 = User.objects.create(email='admintest3@gmail.com', password='test_password3', auth_type='TELEGRAM')
+        self.client.force_authenticate(user=self.user1)
+        self.client.force_authenticate(user=self.user2)
+        self.client.force_authenticate(user=self.user3)
+        self.category = Category.objects.create(name='TestCategory', click_count=1)
+        self.subject_title=SubjectTitle.objects.create(name=self.user1, category=self.category)
+        self.subject = Subject.objects.create(name=self.user1, type="GLOBAL", subject_title=self.subject_title)
+        self.subject_1 = UserSubject.objects.create(subject=self.subject, user = self.user1, total_test_ball=10, started=True)
+        self.subject_1 = UserSubject.objects.create(subject=self.subject, user = self.user2, total_test_ball=0, started=False)
+        self.subject_1 = UserSubject.objects.create(subject=self.subject, user = self.user3, total_test_ball=30, started=True)
+        
+    def test_happy(self):
+        url = reverse("user-subject-list")
+        response = self.client.get(url, format="json")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
