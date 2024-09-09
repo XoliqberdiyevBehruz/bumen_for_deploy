@@ -353,7 +353,34 @@ class GetTestResultsView(RetrieveAPIView):
 class UserSubjectListApiView(ListAPIView):
     serializer_class = UserSubjectStartSerializer
     permission_classes = [IsAuthenticated]
-
     def get_queryset(self):
         user = self.request.user
         return UserSubject.objects.filter(user=user, started=True)
+
+
+class UserPopularSubject(APIView):
+    def get(self, request):
+        started_subjects = (
+            UserSubject.objects.filter(started=True)
+            .values("subject")
+            .annotate(start_count=Count("subject_id"))
+            .order_by("-start_count")
+        )
+
+        if not started_subjects:
+            return Response({"error": "No subjects found"}, status=404)
+
+        subject_ids = [item["subject"] for item in started_subjects]
+        subjects = Subject.objects.filter(id__in=subject_ids)
+
+        serializer = SubjectSerializer(subjects, many=True)
+        return Response(serializer.data)
+
+
+class TopUserList(APIView):
+    def get(self, req: Request):
+        users = User.objects.all()
+
+        sorted_users = sorted(users, key=lambda user: user.user_total_bal, reverse=True)
+
+        return Response(UserSerializer(sorted_users, many=True))
