@@ -335,8 +335,7 @@ class StepTestFinishView(CreateAPIView):
             "questions": "",
         }
         return Response(data=data)
-
-
+    
 class GetTestResultsView(RetrieveAPIView):
     queryset = UserTotalTestResult.objects.all()
     serializer_class = UserTotalTestResultSerializer
@@ -349,31 +348,14 @@ class GetTestResultsView(RetrieveAPIView):
             serializer = self.serializer_class(test_result)
             return Response(serializer.data)
         except UserTotalTestResult.DoesNotExist:
-            return Response(
-                {"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            raise NotFound("Test result not found")  # or you could use pass or another error handling method
 
-
-class VacancyList(APIView):
+class UserSubjectListApiView(ListAPIView):
+    serializer_class = UserSubjectStartSerializer
     permission_classes = [IsAuthenticated]
-
-    def get(self, req: Request, pk):
-        try:
-            result = UserTotalTestResult.objects.get(pk=pk)
-            if not result.percentage >= 60:
-                return Response({"error": "You bal procent must be more than 60 !!!!"})
-            category = UserSubject.objects.get(
-                user=result.user
-            ).subject.subject_title.category
-
-            vacancies = Vacancy.objects.filter(category=category)
-
-            return Response(VacancySerializer(vacancies).data)
-
-        except:
-            return Response(
-                {"error": "This result was not found"}, status=status.HTTP_404_NOT_FOUND
-            )
+    def get_queryset(self):
+        user = self.request.user
+        return UserSubject.objects.filter(user=user, started=True)
 
 
 class UserPopularSubject(APIView):
@@ -402,6 +384,3 @@ class TopUserList(APIView):
         sorted_users = sorted(users, key=lambda user: user.user_total_bal, reverse=True)
 
         return Response(UserSerializer(sorted_users, many=True))
-
-        
-        
