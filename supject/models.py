@@ -3,7 +3,6 @@ from django.utils.translation import gettext_lazy as _
 from django_ckeditor_5.fields import CKEditor5Field
 from django.core.exceptions import ValidationError
 
-from account.models import User
 from common.models import Media
 
 
@@ -69,13 +68,14 @@ class UserSubject(models.Model):
     subject = models.ForeignKey(
         verbose_name=_("Subject"), to=Subject, on_delete=models.CASCADE, related_name='user_subjects'
     )
-    user = models.ForeignKey(verbose_name=_("User"), to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(verbose_name=_("User"), to="account.User", on_delete=models.CASCADE)
     total_test_ball = models.PositiveIntegerField(
         verbose_name=_("Total test ball"), default=0
     )
     started_time = models.DateTimeField(auto_now_add=True)
     started = models.BooleanField(default=False)
-
+    finished = models.BooleanField(default=False)
+    
     def __str__(self) -> str:
         return f"{self.user.email} - {self.subject.name}"
 
@@ -107,7 +107,7 @@ class Club(models.Model):
         verbose_name=_("Subject"), to=Subject, on_delete=models.CASCADE
     )
     users = models.ManyToManyField(
-        verbose_name=_("Users"), to=User, related_name="clubusers", blank=True
+        verbose_name=_("Users"), to="account.User", related_name="clubusers", blank=True
     )
     description = models.TextField(verbose_name=_("Description"))
 
@@ -252,7 +252,7 @@ class UserTestResult(models.Model):
         verbose_name=_("Question"), to=TestQuestion, on_delete=models.CASCADE
     )
     test_answers = models.ManyToManyField(TestAnswer)
-    user = models.ForeignKey(verbose_name=_("Users"), to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(verbose_name=_("Users"), to="account.User", on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"{self.pk} - {self.user.username}"
@@ -266,7 +266,7 @@ class UserTotalTestResult(models.Model):
     step_test = models.ForeignKey(
         verbose_name=_("Step test"), to=StepTest, on_delete=models.CASCADE
     )
-    user = models.ForeignKey(verbose_name=_("Users"), to=User, on_delete=models.CASCADE)
+    user = models.ForeignKey(verbose_name=_("Users"), to="account.User", on_delete=models.CASCADE)
     ball = models.FloatField(verbose_name=_("Bal"), null=True, blank=True)
     correct_answers = models.PositiveIntegerField(
         verbose_name=_("Count of correct answers"), null=True, blank=True
@@ -286,7 +286,7 @@ class UserTotalTestResult(models.Model):
 
 
 class UserStep(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user_steps")
+    user = models.ForeignKey("account.User", on_delete=models.CASCADE, related_name="user_steps")
     step = models.ForeignKey(Step, on_delete=models.CASCADE, related_name="user_steps")
     finished = models.BooleanField(default=False)
     finished_at = models.DateTimeField(null=True, blank=True)

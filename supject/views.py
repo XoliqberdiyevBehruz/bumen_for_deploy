@@ -3,14 +3,25 @@ from drf_yasg import openapi
 from django.utils.translation import gettext_lazy as _
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
+
 from rest_framework.exceptions import APIException, ValidationError, NotFound
+
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
+
+from django.shortcuts import get_object_or_404
+from rest_framework.generics import (
+    CreateAPIView,
+    ListAPIView,
+    ListCreateAPIView,
+    RetrieveAPIView,
+)
+
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import supject.serializers
-from account.models import User
+from account.models import User,Groups
 from common import error_codes
 from supject.models import *
 from supject.serializers import *
@@ -354,7 +365,49 @@ class GetTestResultsView(RetrieveAPIView):
 class UserSubjectListApiView(ListAPIView):
     serializer_class = UserSubjectStartSerializer
     permission_classes = [IsAuthenticated]
-
     def get_queryset(self):
         user = self.request.user
         return UserSubject.objects.filter(user=user, started=True)
+
+
+class UserPopularSubject(APIView):
+    def get(self, request):
+        started_subjects = (
+            UserSubject.objects.filter(started=True)
+            .values("subject")
+            .annotate(start_count=Count("subject_id"))
+            .order_by("-start_count")
+        )
+
+        if not started_subjects:
+            return Response({"error": "No subjects found"}, status=404)
+
+        subject_ids = [item["subject"] for item in started_subjects]
+        subjects = Subject.objects.filter(id__in=subject_ids)
+
+        serializer = SubjectSerializer(subjects, many=True)
+        return Response(serializer.data)
+
+
+class JoinDiscussionGroupView(APIView):
+    def post(self, request, user_id, subject_id):
+        user_subject = get_object_or_404(UserSubject, user_id=user_id, subject_id=subject_id)
+
+        if not user_subject.finished:
+            return Response({"detail": "The user has not yet completed the course."}, status=status.HTTP_400_BAD_REQUEST)
+
+        discussion_group = Groups.objects.first()
+        if discussion_group:
+            discussion_group.add_member(user_subject.user)
+            return Response({"detail": "The user joined the feedback group."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"detail": "No feedback team was found."}, status=status.HTTP_404_NOT_FOUND)
+
+class TopUserList(APIView):
+    def get(self, req: Request):
+        users = User.objects.all()
+
+        sorted_users = sorted(users, key=lambda user: user.user_total_bal, reverse=True)
+
+        return Response(UserSerializer(sorted_users, many=True))
+
