@@ -1,8 +1,10 @@
 from django.db.models import Count, F, Q
 from drf_yasg import openapi
+from django.utils.translation import gettext_lazy as _
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
-from rest_framework.exceptions import APIException, ValidationError
+
+from rest_framework.exceptions import APIException, ValidationError, NotFound
 
 from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
 
@@ -18,7 +20,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 import supject.serializers
 from account.models import User,Groups
 from common import error_codes
@@ -51,8 +52,8 @@ class CategoryAPIView(APIView):
 
         except Exception as e:
             return Response(
-                {"error": f"Category was not found {e}"},
-                status=status.HTTP_404_NOT_FOUND,
+                {"error": _(f"Category was not found {e}")},
+                status=status.HTTP_404_NOT_FOUND,   
             )
 
 
@@ -70,7 +71,7 @@ class StartSubjectApi(APIView):
             subject = Subject.objects.get(id=subject_id)
         except SubjectTitle.DoesNotExist:
             return Response(
-                {"error": "Subject not found"}, status=status.HTTP_404_NOT_FOUND
+                {"error": _("Subject not found")}, status=status.HTTP_404_NOT_FOUND
             )
         # usersubject yaratamiz
         user_subject, created = UserSubject.objects.get_or_create(
@@ -126,18 +127,19 @@ class StepDetailAPIView(RetrieveAPIView):
                     serializer_new = self.serializer_class(next_step)
                     return Response(data=serializer_new.data)
                 return Response(
-                    data={"error": "You were not allowed to pass next step"},
+                    data={"error": _("You were not allowed to pass next step")},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
             else:
                 return Response(
-                    data={"error": "You didn't start subject yet"},
+                    data={"error": _("You didn't start subject yet")},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
         except Step.DoesNotExist:
-            raise ValidationError("Step does not exists")
+            raise ValidationError(_("Step does not exists"))
+        
         except StepTest.DoesNotExist:
-            raise ValidationError("Steptest does not exists")
+            raise ValidationError(_("Steptest does not exists"))
 
         except Exception as e:
             raise APIException(e)
@@ -194,7 +196,7 @@ class UserPopularSubject(APIView):
         )
 
         if not started_subjects:
-            return Response({"error": "No subjects found"}, status=404)
+            return Response({"error": _("No subjects found")}, status=404)
 
         subject_ids = [item["subject"] for item in started_subjects]
         subjects = Subject.objects.filter(id__in=subject_ids)
@@ -246,7 +248,7 @@ class UserClubsView(APIView):
 
         if not user_subjects.exists():
             return Response(
-                {"error": "You do not have subjects so we can not enter you to club"},
+                {"error": _("You do not have subjects so we can not enter you to club")},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -358,7 +360,7 @@ class GetTestResultsView(RetrieveAPIView):
             serializer = self.serializer_class(test_result)
             return Response(serializer.data)
         except UserTotalTestResult.DoesNotExist:
-            raise NotFound("Test result not found")  # or you could use pass or another error handling method
+            raise NotFound(_("Test result not found"))
 
 class UserSubjectListApiView(ListAPIView):
     serializer_class = UserSubjectStartSerializer
