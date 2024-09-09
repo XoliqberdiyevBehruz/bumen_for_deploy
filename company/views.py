@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from company.models import FAQ, ContactWithUs,Contacts
 from company.serializers import ContactWithUsSerializer, FAQSerializer,ContactsSerializer
-
+from django.utils.translation import gettext_lazy as _
 # from .serializers import ContactsSerializer
 
 class ContactWithUsView(CreateAPIView):
@@ -24,7 +24,7 @@ class FAQAPIView(APIView):
             serializer = FAQSerializer(queryset, many=True)
             return Response(serializer.data)
         except Exception:
-            return Response(data={"message": "Internal Server Error"}, status=500)
+            return Response(data={"message": _("Internal Server Error")}, status=500)
 
 
 
@@ -35,4 +35,4 @@ class ContactsDetailView(APIView):
             serializer = ContactsSerializer(contact)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Contacts.DoesNotExist:
-            return Response({"detail": "Contact not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": _("Contact not found.")}, status=status.HTTP_404_NOT_FOUND)
