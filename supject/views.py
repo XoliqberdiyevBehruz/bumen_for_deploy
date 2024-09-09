@@ -335,8 +335,7 @@ class StepTestFinishView(CreateAPIView):
             "questions": "",
         }
         return Response(data=data)
-
-
+    
 class GetTestResultsView(RetrieveAPIView):
     queryset = UserTotalTestResult.objects.all()
     serializer_class = UserTotalTestResultSerializer
@@ -349,47 +348,12 @@ class GetTestResultsView(RetrieveAPIView):
             serializer = self.serializer_class(test_result)
             return Response(serializer.data)
         except UserTotalTestResult.DoesNotExist:
-            return Response(
-                {"message": "No test results found"}, status=status.HTTP_404_NOT_FOUND
-            )
+            raise NotFound("Test result not found")  # or you could use pass or another error handling method
 
-
-class VacancyList(APIView):
+class UserSubjectListApiView(ListAPIView):
+    serializer_class = UserSubjectStartSerializer
     permission_classes = [IsAuthenticated]
 
-    def get(self, req: Request, pk):
-        try:
-            result = UserTotalTestResult.objects.get(pk=pk)
-            if not result.percentage >= 60:
-                return Response({"error": "You bal procent must be more than 60 !!!!"})
-            category = UserSubject.objects.get(
-                user=result.user
-            ).subject.subject_title.category
-
-            vacancies = Vacancy.objects.filter(category=category)
-
-            return Response(VacancySerializer(vacancies).data)
-
-        except:
-            return Response(
-                {"error": "This result was not found"}, status=status.HTTP_404_NOT_FOUND
-            )
-
-
-class UserPopularSubject(APIView):
-    def get(self, request):
-        started_subjects = (
-            UserSubject.objects.filter(started=True)
-            .values("subject")
-            .annotate(start_count=Count("subject_id"))
-            .order_by("-start_count")
-        )
-
-        if not started_subjects:
-            return Response({"error": "No subjects found"}, status=404)
-
-        subject_ids = [item["subject"] for item in started_subjects]
-        subjects = Subject.objects.filter(id__in=subject_ids)
-
-        serializer = SubjectSerializer(subjects, many=True)
-        return Response(serializer.data)
+    def get_queryset(self):
+        user = self.request.user
+        return UserSubject.objects.filter(user=user, started=True)
