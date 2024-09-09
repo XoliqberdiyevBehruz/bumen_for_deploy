@@ -1,26 +1,22 @@
 from django.db.models import Count, F, Q
+from django.shortcuts import get_object_or_404
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.exceptions import APIException, ValidationError
-
-from rest_framework.generics import CreateAPIView, ListAPIView, RetrieveAPIView
-
-from django.shortcuts import get_object_or_404
 from rest_framework.generics import (
     CreateAPIView,
     ListAPIView,
     ListCreateAPIView,
     RetrieveAPIView,
 )
-
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
 import supject.serializers
-from account.models import User,Groups
+from account.models import Groups, User
 from common import error_codes
 from supject.models import *
 from supject.serializers import *
@@ -79,7 +75,7 @@ class StartSubjectApi(APIView):
         if created:
             user_subject.started = True
             user_subject.save()
-        club = Club.objects.get(subject=subject)
+        club, created_club = Club.objects.get_or_create(subject=subject)
         club.users.add(user)
         club.save()
         subject_serializer = UserSubjectSerializer(user_subject)
@@ -114,6 +110,9 @@ class StepDetailAPIView(RetrieveAPIView):
                 user=request.user, subject=step.subject, started=True
             )
             if user_subject.exists():
+                new_step, created = UserStep.objects.get_or_create(
+                    user=request.user, step=step
+                )
                 if step.order == 1:
                     serailizer = self.serializer_class(step)
                     return Response(data=serailizer.data)
@@ -284,8 +283,8 @@ class StepTestFinishView(CreateAPIView):
         serializer.is_valid(raise_exception=True)
         user_total_test_result = self.queryset.filter(
             id=serializer.validated_data["result_id"], user=request.user, finished=False
-        )
-        if not user_total_test_result.exists():
+        ).last()
+        if not user_total_test_result:
             return Response(
                 data={"message": error_codes.USER_TOTAL_TEST_RESULT_MSG},
                 status=status.HTTP_404_NOT_FOUND,
@@ -296,10 +295,12 @@ class StepTestFinishView(CreateAPIView):
             question_ball = 0
             question = TestQuestion.objects.get(id=qst["question_id"])
             user_test_result = UserTestResult.objects.create(
-                user=request.user, test_question=question
+                user=request.user,
+                test_question=question,
+                total_result=user_total_test_result,
             )
             if question.question_type == TestQuestion.QuestionType.MULTIPLE:
-                answers = question.answers.filter(id__in=qst["answer_ids"])
+                answers = question.test_answers.filter(id__in=qst["answer_ids"])
                 for ans in answers:
                     user_test_result.test_answers.add(ans)
                     if ans.is_correct == True:
@@ -310,7 +311,7 @@ class StepTestFinishView(CreateAPIView):
                     else:
                         continue
             else:
-                answer = question.answers.filter(id__in=qst["answer_ids"]).last()
+                answer = question.test_answers.filter(id__in=qst["answer_ids"]).last()
                 user_test_result.test_answers.add(answer)
                 if answer.is_correct == True:
                     question_ball += calculate_test_ball(
@@ -320,11 +321,6 @@ class StepTestFinishView(CreateAPIView):
 
             total_ball += question_ball
 
-            if not answers.exists():
-                return Response(
-                    data={"message": error_codes.TEST_ANSWERS_NOT_EXISTS},
-                    status=status.HTTP_404_NOT_FOUND,
-                )
         percentage = total_ball * 100 // len(questions)
         user_total_test_result.percentage = percentage
         user_total_test_result.ball = total_ball
@@ -338,14 +334,19 @@ class StepTestFinishView(CreateAPIView):
             * user_total_test_result.step_test.ball_for_each_test,
             "ball": user_total_test_result.ball,
             "percentage": user_total_test_result.percentage,
-            "correct_answers_count": user_results.filter(test_answers__is_correct=True),
+            "correct_answers_count": user_results.filter(
+                test_answers__is_correct=True
+            ).count(),
             "incorrect_answers_count": user_results.filter(
                 test_answers__is_correct=False
-            ),
-            "questions": "",
+            ).count(),
+            "questions": UserTestResultSerializer(
+                user_total_test_result.total_results.all(), many=True
+            ).data,
         }
         return Response(data=data)
-    
+
+
 class GetTestResultsView(RetrieveAPIView):
     queryset = UserTotalTestResult.objects.all()
     serializer_class = UserTotalTestResultSerializer
@@ -358,11 +359,15 @@ class GetTestResultsView(RetrieveAPIView):
             serializer = self.serializer_class(test_result)
             return Response(serializer.data)
         except UserTotalTestResult.DoesNotExist:
-            raise NotFound("Test result not found")  # or you could use pass or another error handling method
+            raise Exception(
+                "Test result not found"
+            )  # or you could use pass or another error handling method
+
 
 class UserSubjectListApiView(ListAPIView):
     serializer_class = UserSubjectStartSerializer
     permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
         user = self.request.user
         return UserSubject.objects.filter(user=user, started=True)
@@ -389,17 +394,29 @@ class UserPopularSubject(APIView):
 
 class JoinDiscussionGroupView(APIView):
     def post(self, request, user_id, subject_id):
-        user_subject = get_object_or_404(UserSubject, user_id=user_id, subject_id=subject_id)
+        user_subject = get_object_or_404(
+            UserSubject, user_id=user_id, subject_id=subject_id
+        )
 
         if not user_subject.finished:
-            return Response({"detail": "The user has not yet completed the course."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "The user has not yet completed the course."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         discussion_group = Groups.objects.first()
         if discussion_group:
             discussion_group.add_member(user_subject.user)
-            return Response({"detail": "The user joined the feedback group."}, status=status.HTTP_200_OK)
+            return Response(
+                {"detail": "The user joined the feedback group."},
+                status=status.HTTP_200_OK,
+            )
         else:
-            return Response({"detail": "No feedback team was found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"detail": "No feedback team was found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
 
 class TopUserList(APIView):
     def get(self, req: Request):
@@ -409,3 +426,68 @@ class TopUserList(APIView):
 
         return Response(UserSerializer(sorted_users, many=True))
 
+
+class SubmitTestView(CreateAPIView):
+    queryset = UserTotalTestResult.objects.all()
+    serializer_class = UserTestResultForSubmitSerializer
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user_total_test_result = self.queryset.filter(
+            id=serializer.validated_data["result_id"], user=request.user, finished=False
+        ).first()
+
+        if not user_total_test_result:
+            return Response(
+                data={
+                    "message": "Test natijalari topilmadi yoki allaqachon yakunlangan"
+                },
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        questions = serializer.validated_data["test_question"]
+        total_ball = 0
+
+        for qst in questions:
+            question_ball = 0
+            question = TestQuestion.objects.get(id=qst["question_id"])
+            user_test_result = UserTestResult.objects.create(
+                user=request.user,
+                test_question=question,
+                total_result=user_total_test_result,
+            )
+
+            if question.question_type == TestQuestion.QuestionType.MULTIPLE:
+                answers = question.test_answers.filter(id__in=qst["answer_ids"])
+                for ans in answers:
+                    user_test_result.test_answers.add(ans)
+                    if ans.is_correct:
+                        question_ball += (
+                            user_total_test_result.step_test.ball_for_each_test
+                        )
+            else:
+                answer = question.test_answers.filter(id__in=qst["answer_ids"]).first()
+                user_test_result.test_answers.add(answer)
+                if answer.is_correct:
+                    question_ball += user_total_test_result.step_test.ball_for_each_test
+
+            total_ball += question_ball
+
+        user_total_test_result.ball = total_ball
+        user_total_test_result.percenateg = (
+            total_ball
+            / (len(questions) * user_total_test_result.step_test.ball_for_each_test)
+        ) * 100
+        user_total_test_result.finished = True
+        user_total_test_result.save()
+
+        return Response(
+            {
+                "message": "Test muvaffaqiyatli yakunlandi",
+                "ball": total_ball,
+                "percentage": user_total_test_result.percenateg,
+            }
+        )

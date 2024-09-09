@@ -47,7 +47,6 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     "main",
 ]
 
@@ -109,11 +108,11 @@ LOCALE_PATHS = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config["POSTGRES_NAME"],
-        "HOST": config["POSTGRES_HOST"],
-        "USER": config["POSTGRES_USER"],
-        "PORT": config["POSTGRES_PORT"],
-        "PASSWORD": config["POSTGRES_PASSWORD"],
+        "NAME": config["DB_NAME"],
+        "HOST": config["DB_HOST"],
+        "USER": config["DB_USER"],
+        "PORT": config["DB_PORT"],
+        "PASSWORD": config["DB_PASSWORD"],
     }
 }
 
@@ -362,7 +361,7 @@ SWAGGER_SETTINGS = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=5),
     "ROTATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_ROTATION": False,
