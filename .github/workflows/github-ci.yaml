@@ -88,5 +88,5 @@ jobs:
             cd ${{ secrets.PROJECT_PATH }}
             git pull ${{ secrets.REPO_URL }}
 
-      - name: Restart all services
-        run: reload.sh
+      # - name: Restart all services
+      #   run: reload.sh
