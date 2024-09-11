@@ -30,12 +30,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config["SECRET_KEY"]
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = bool(config["DEBUG"])
+DEBUG = bool(os.getenv("DEBUG"))
 
-ALLOWED_HOSTS = config["ALLOWED_HOSTS"].split(",")
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS").split(",")
 
 # Application definition
 
@@ -108,11 +108,11 @@ LOCALE_PATHS = [
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": config["DB_NAME"],
-        "HOST": config["DB_HOST"],
-        "USER": config["DB_USER"],
-        "PORT": config["DB_PORT"],
-        "PASSWORD": config["DB_PASSWORD"],
+        "NAME": os.getenv("DB_NAME"),
+        "HOST": os.getenv("DB_HOST"),
+        "USER": os.getenv("DB_USER"),
+        "PORT": os.getenv("DB_PORT"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
     }
 }
 
@@ -182,7 +182,7 @@ MODELTRANSLATION_LANGUAGES = ("en", "uz", "ru")
 
 MODELTRANSLATION_TRANSLATION_FILES = ("news.translation", "company.translation")
 
-HOST = config["HOST"]
+HOST = os.getenv("HOST")
 
 JAZZMIN_SETTINGS = JAZZMIN_SETTINGS
 
@@ -333,8 +333,8 @@ EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_USE_TLS = True
 EMAIL_PORT = 587
-EMAIL_HOST_USER = config["EMAIL_USER"]
-EMAIL_HOST_PASSWORD = config["EMAIL_PASSWORD"]
+EMAIL_HOST_USER = os.getenv("EMAIL_USER")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
 OTP_CODE_VERIFICATION_TIME = 2
 
@@ -407,7 +407,7 @@ sentry_sdk.init(
     profiles_sample_rate=1.0,
 )
 
-SOCIAL_SECRET_PASSWORD = config["SOCIAL_SECRET_PASSWORD"]
+SOCIAL_SECRET_PASSWORD = os.getenv("SOCIAL_SECRET_PASSWORD")
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
@@ -418,8 +418,8 @@ SOCIAL_USER_PASSWORD = os.getenv("SOCIAL_USER_PASSWORD")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 # Celery Configurations
-CELERY_BROKER_URL = config["CELERY_BROKER_URL"]
-CELERY_RESULT_BACKEND = config["CELERY_RESULT_BACKEND"]
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND")
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TIMEZONE = "Asia/Tashkent"
 CELERY_TASK_TRACK_STARTED = True
@@ -427,4 +427,4 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_IMPORTS = "company.tasks"
 
 
-FCM_SERVER_KEY = config["SOCIAL_SECRET_PASSWORD"]
+FCM_SERVER_KEY = os.getenv("SOCIAL_SECRET_PASSWORD")
