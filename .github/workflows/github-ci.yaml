@@ -85,7 +85,7 @@ jobs:
           script: |
             cd ${{ secrets.PROJECT_PATH }}
             source env/bin/activate
-            cd ${{ secrets.PROJECT_SOURCE_PATH }}
+            cd ${{ secrets.PROJECT_PATH }}
             git pull ${{ secrets.REPO_URL }}
 
       - name: Restart all services
