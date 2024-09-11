@@ -84,7 +84,7 @@ class StartSubjectApi(APIView):
 
 
 class SubjectTitleApiView(ListAPIView):
-    queryset = SubjectTitle.objects.all()
+    queryset = SubjectTitle.objects.prefetch_related("subjects").all()
     serializer_class = SubjectTitleSerializer
 
     @swagger_auto_schema(manual_parameters=[category_id])
@@ -92,7 +92,7 @@ class SubjectTitleApiView(ListAPIView):
         query_param = request.query_params.get("category_id", None)
         if not query_param:
             return Response(data=[])
-        subject_titles = SubjectTitle.objects.filter(category_id=query_param)
+        subject_titles = self.queryset.filter(category_id=query_param)
         serializer = SubjectTitleListSerializer(subject_titles, many=True)
         return Response(data=serializer.data)
 
