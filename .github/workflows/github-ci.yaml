@@ -84,6 +84,6 @@ jobs:
             source env/bin/activate
             cd ${{ secrets.PROJECT_SOURCE_PATH }}
             git pull ${{ secrets.REPO_URL }}
-    steps:
+
       - name: Restart all services
         run: reload.sh
