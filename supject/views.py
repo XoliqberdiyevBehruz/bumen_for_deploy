@@ -212,6 +212,7 @@ class UserPopularSubject(APIView):
 
 class SubjectSearchApiView(ListAPIView):
     queryset = SubjectTitle.objects.all()
+    serializer_class = SubjectSearchSerializer
 
     @swagger_auto_schema(manual_parameters=[query])
     def get(self, request, *args, **kwargs):
